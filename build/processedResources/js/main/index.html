@@ -19,6 +19,12 @@
     window._handDetected = false;
     window._handLandmarks = null;
     window._gestureActive = false;
+    // Two-hand support
+    window._handCount = 0;
+    window._hand2Detected = false;
+    window._hand2Landmarks = null;
+    window._cameraPreviewOn = false;
+    window._previewFrameCount = 0;
 
     window.initGesture = function() {
         if (window._gestureActive) return;
@@ -41,8 +47,8 @@
             canvas = document.createElement('canvas');
             canvas.id = 'gestureCanvas';
             canvas.className = 'gesture-canvas';
-            canvas.width = 320;
-            canvas.height = 240;
+            canvas.width = 160;
+            canvas.height = 120;
             document.body.appendChild(canvas);
         }
         canvas.style.display = '';
@@ -59,26 +65,38 @@
         }
         label.style.display = '';
 
-        // Initialize MediaPipe Hands
+        // Initialize MediaPipe Hands (2 hands for resize/pull gestures)
         var hands = new Hands({
             locateFile: function(file) {
                 return 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + file;
             }
         });
         hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.5
+            maxNumHands: 2,
+            modelComplexity: 0,
+            minDetectionConfidence: 0.65,
+            minTrackingConfidence: 0.45
         });
         hands.onResults(function(results) {
-            // Store landmarks for Kotlin to read
+            // Store landmarks for Kotlin to read (primary hand)
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 window._handDetected = true;
                 window._handLandmarks = results.multiHandLandmarks[0];
+                window._handCount = results.multiHandLandmarks.length;
+                // Second hand support
+                if (results.multiHandLandmarks.length > 1) {
+                    window._hand2Detected = true;
+                    window._hand2Landmarks = results.multiHandLandmarks[1];
+                } else {
+                    window._hand2Detected = false;
+                    window._hand2Landmarks = null;
+                }
             } else {
                 window._handDetected = false;
                 window._handLandmarks = null;
+                window._handCount = 0;
+                window._hand2Detected = false;
+                window._hand2Landmarks = null;
             }
 
             // Draw webcam frame + hand skeleton on canvas
@@ -88,19 +106,57 @@
                 ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
             }
             if (results.multiHandLandmarks) {
+                var colors = ['#00FF88', '#FF8800'];
+                var dotColors = ['#FF0088', '#0088FF'];
                 for (var i = 0; i < results.multiHandLandmarks.length; i++) {
                     var hand = results.multiHandLandmarks[i];
                     if (typeof drawConnectors !== 'undefined') {
                         drawConnectors(ctx, hand, HAND_CONNECTIONS,
-                            {color: '#00FF88', lineWidth: 2});
+                            {color: colors[i] || colors[0], lineWidth: 2});
                     }
                     if (typeof drawLandmarks !== 'undefined') {
                         drawLandmarks(ctx, hand,
-                            {color: '#FF0088', lineWidth: 1, radius: 3});
+                            {color: dotColors[i] || dotColors[0], lineWidth: 1, radius: 3});
                     }
                 }
             }
             ctx.restore();
+
+            // Draw to camera preview canvas if enabled (every 3rd frame)
+            if (window._cameraPreviewOn) {
+                window._previewFrameCount = (window._previewFrameCount || 0) + 1;
+                if (window._previewFrameCount % 3 === 0) {
+                var preview = document.getElementById('cameraPreview');
+                if (preview) {
+                    var pCtx = preview.getContext('2d');
+                    pCtx.save();
+                    pCtx.clearRect(0, 0, preview.width, preview.height);
+                    if (results.image) {
+                        pCtx.drawImage(results.image, 0, 0, preview.width, preview.height);
+                    }
+                    if (results.multiHandLandmarks) {
+                        var previewColors = ['#00FF88', '#FF8800'];
+                        var previewDots = ['#FF0088', '#0088FF'];
+                        for (var j = 0; j < results.multiHandLandmarks.length; j++) {
+                            var h = results.multiHandLandmarks[j];
+                            if (typeof drawConnectors !== 'undefined') {
+                                drawConnectors(pCtx, h, HAND_CONNECTIONS,
+                                    {color: previewColors[j] || previewColors[0], lineWidth: 3});
+                            }
+                            if (typeof drawLandmarks !== 'undefined') {
+                                drawLandmarks(pCtx, h,
+                                    {color: previewDots[j] || previewDots[0], lineWidth: 1, radius: 4});
+                            }
+                        }
+                    }
+                    // Status text
+                    pCtx.font = '13px Inter, sans-serif';
+                    pCtx.fillStyle = window._handDetected ? '#00FF88' : '#FF4466';
+                    pCtx.fillText(window._handDetected ? (window._handCount + ' hand(s) detected') : 'No hand detected', 12, 22);
+                    pCtx.restore();
+                }
+                }
+            }
         });
         window._handsInstance = hands;
 
@@ -111,8 +167,8 @@
                     await window._handsInstance.send({image: video});
                 }
             },
-            width: 320,
-            height: 240
+            width: 240,
+            height: 180
         });
         camera.start();
         window._cameraInstance = camera;
@@ -122,6 +178,9 @@
         window._gestureActive = false;
         window._handDetected = false;
         window._handLandmarks = null;
+        window._handCount = 0;
+        window._hand2Detected = false;
+        window._hand2Landmarks = null;
 
         if (window._cameraInstance) {
             window._cameraInstance.stop();

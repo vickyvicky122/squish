@@ -27,7 +27,6 @@
   var HemisphereLight = $module$three.HemisphereLight;
   var PointLight = $module$three.PointLight;
   var DirectionalLight = $module$three.DirectionalLight;
-  var IcosahedronGeometry = $module$three.IcosahedronGeometry;
   var BufferAttribute = $module$three.BufferAttribute;
   var CanvasTexture = $module$three.CanvasTexture;
   var RepeatWrapping = $module$three.RepeatWrapping;
@@ -37,34 +36,40 @@
   var Clock = $module$three.Clock;
   var Vector3 = $module$three.Vector3;
   var hypot = Math.hypot;
-  var protoOf = kotlin_kotlin.$_$.q;
+  var protoOf = kotlin_kotlin.$_$.v;
   var VOID = kotlin_kotlin.$_$.a;
-  var getStringHashCode = kotlin_kotlin.$_$.o;
-  var getNumberHashCode = kotlin_kotlin.$_$.n;
-  var THROW_CCE = kotlin_kotlin.$_$.y;
-  var equals = kotlin_kotlin.$_$.m;
-  var classMeta = kotlin_kotlin.$_$.l;
-  var setMetadataFor = kotlin_kotlin.$_$.r;
-  var ArrayList_init_$Create$ = kotlin_kotlin.$_$.b;
-  var numberToInt = kotlin_kotlin.$_$.p;
-  var coerceIn = kotlin_kotlin.$_$.v;
-  var Unit_getInstance = kotlin_kotlin.$_$.f;
-  var charSequenceLength = kotlin_kotlin.$_$.k;
-  var removeAll = kotlin_kotlin.$_$.h;
-  var coerceAtMost = kotlin_kotlin.$_$.t;
-  var coerceAtLeast = kotlin_kotlin.$_$.s;
-  var mutableSetOf = kotlin_kotlin.$_$.g;
-  var coerceIn_0 = kotlin_kotlin.$_$.u;
-  var Default_getInstance = kotlin_kotlin.$_$.e;
-  var THROW_IAE = kotlin_kotlin.$_$.z;
-  var enumEntries = kotlin_kotlin.$_$.i;
-  var Enum = kotlin_kotlin.$_$.w;
-  var println = kotlin_kotlin.$_$.j;
-  var Pair = kotlin_kotlin.$_$.x;
-  var ensureNotNull = kotlin_kotlin.$_$.a1;
-  var LinkedHashSet_init_$Create$ = kotlin_kotlin.$_$.c;
-  var DoubleCompanionObject_getInstance = kotlin_kotlin.$_$.d;
-  var isNaN_0 = kotlin_kotlin.$_$.b1;
+  var getStringHashCode = kotlin_kotlin.$_$.s;
+  var getNumberHashCode = kotlin_kotlin.$_$.r;
+  var THROW_CCE = kotlin_kotlin.$_$.e1;
+  var equals = kotlin_kotlin.$_$.q;
+  var classMeta = kotlin_kotlin.$_$.p;
+  var setMetadataFor = kotlin_kotlin.$_$.w;
+  var ArrayList_init_$Create$ = kotlin_kotlin.$_$.c;
+  var numberToInt = kotlin_kotlin.$_$.u;
+  var coerceIn = kotlin_kotlin.$_$.b1;
+  var Unit_getInstance = kotlin_kotlin.$_$.g;
+  var charSequenceLength = kotlin_kotlin.$_$.o;
+  var removeAll = kotlin_kotlin.$_$.l;
+  var coerceAtMost = kotlin_kotlin.$_$.z;
+  var coerceAtLeast = kotlin_kotlin.$_$.y;
+  var mutableSetOf = kotlin_kotlin.$_$.k;
+  var get_PI = kotlin_kotlin.$_$.x;
+  var coerceIn_0 = kotlin_kotlin.$_$.a1;
+  var Default_getInstance = kotlin_kotlin.$_$.f;
+  var THROW_IAE = kotlin_kotlin.$_$.f1;
+  var enumEntries = kotlin_kotlin.$_$.m;
+  var Enum = kotlin_kotlin.$_$.c1;
+  var hashCode = kotlin_kotlin.$_$.t;
+  var println = kotlin_kotlin.$_$.n;
+  var ArrayList_init_$Create$_0 = kotlin_kotlin.$_$.b;
+  var average = kotlin_kotlin.$_$.h;
+  var ensureNotNull = kotlin_kotlin.$_$.g1;
+  var Pair = kotlin_kotlin.$_$.d1;
+  var collectionSizeOrDefault = kotlin_kotlin.$_$.i;
+  var emptyList = kotlin_kotlin.$_$.j;
+  var LinkedHashSet_init_$Create$ = kotlin_kotlin.$_$.d;
+  var DoubleCompanionObject_getInstance = kotlin_kotlin.$_$.e;
+  var isNaN_0 = kotlin_kotlin.$_$.h1;
   //endregion
   //region block: pre-declaration
   setMetadataFor(BallColor, 'BallColor', classMeta);
@@ -72,7 +77,10 @@
   setMetadataFor(SoundEngine, 'SoundEngine', classMeta, VOID, VOID, SoundEngine);
   setMetadataFor(DeformationController, 'DeformationController', classMeta);
   setMetadataFor(SpringPhysics, 'SpringPhysics', classMeta);
+  setMetadataFor(WaveSystem, 'WaveSystem', classMeta, VOID, VOID, WaveSystem);
   setMetadataFor(HandGesture, 'HandGesture', classMeta, Enum);
+  setMetadataFor(Finger3D, 'Finger3D', classMeta);
+  setMetadataFor(Hand3DState, 'Hand3DState', classMeta);
   setMetadataFor(GestureEngine, 'GestureEngine', classMeta, VOID, VOID, GestureEngine);
   setMetadataFor(HtmlOverlay, 'HtmlOverlay', classMeta);
   setMetadataFor(InputHandler, 'InputHandler', classMeta, VOID, VOID, InputHandler);
@@ -291,7 +299,7 @@
     var accentLight = new DirectionalLight(16315647, 0.8);
     accentLight.position.set(1.0, 6.0, 3.0);
     scene.add(accentLight);
-    var geometry = new IcosahedronGeometry(2.0, 4);
+    var geometry = new SphereGeometry(2.0, 32, 24);
     var tmp = geometry.getAttribute('position');
     var posAttr = tmp instanceof BufferAttribute ? tmp : THROW_CCE();
     var vertexCount = posAttr.count;
@@ -299,7 +307,7 @@
     var colorAttr = new BufferAttribute(colorArray, 3);
     geometry.setAttribute('color', colorAttr);
     geometry.computeVertexNormals();
-    var texSize = 512;
+    var texSize = 256;
     // Inline function 'kotlin.apply' call
     var tmp_0 = document.createElement('canvas');
     var this_0 = tmp_0 instanceof HTMLCanvasElement ? tmp_0 : THROW_CCE();
@@ -384,10 +392,10 @@
     foamRoughTex.wrapS = RepeatWrapping;
     foamRoughTex.wrapT = RepeatWrapping;
     foamRoughTex.repeat.set(3.0, 3.0);
-    var material = new MeshPhysicalMaterial({color: 16777215, vertexColors: true, roughness: 0.06, metalness: 0.02, clearcoat: 1.0, clearcoatRoughness: 0.02, sheen: 0.3, sheenRoughness: 0.2, sheenColor: 16777215, iridescence: 0.15, iridescenceIOR: 1.5, transparent: true, opacity: 0.72, envMapIntensity: 1.5});
+    var material = new MeshPhysicalMaterial({color: 16777215, vertexColors: true, roughness: 0.02, metalness: 0.0, clearcoat: 1.0, clearcoatRoughness: 0.01, sheen: 0.0, sheenRoughness: 0.0, sheenColor: 16777215, iridescence: 0.15, iridescenceIOR: 1.33, transmission: 0.85, thickness: 1.5, ior: 1.33, transparent: true, opacity: 0.95, envMapIntensity: 2.0});
     var blob = new Mesh(geometry, material);
     scene.add(blob);
-    var shadowGeo = new IcosahedronGeometry(2.4, 1);
+    var shadowGeo = new SphereGeometry(2.4, 16, 12);
     var shadowMat = new MeshStandardMaterial({color: 0, transparent: true, opacity: 0.08, roughness: 1.0, metalness: 0.0});
     var shadow = new Mesh(shadowGeo, shadowMat);
     shadow.position.set(0.0, -2.2, 0.0);
@@ -395,6 +403,7 @@
     scene.add(shadow);
     var springPhysics = new SpringPhysics(geometry);
     var deformController = new DeformationController(springPhysics);
+    var waveSystem = new WaveSystem();
     var sound = new SoundEngine();
     var soundEnabled = {_v: false};
     var gestureEngine = new GestureEngine();
@@ -407,11 +416,11 @@
     var currentScaleIndex = {_v: 0};
     var currentStyleIndex = {_v: 0};
     var overlayRef = {_v: null};
-    var tmp_4 = main$lambda(deformController, soundEnabled, sound);
+    var tmp_4 = main$lambda(deformController, waveSystem, soundEnabled, sound);
     var tmp_5 = main$lambda_0(soundEnabled, sound, overlayRef);
     var tmp_6 = main$lambda_1(currentThemeIndex);
     var tmp_7 = main$lambda_2(currentScaleIndex, overlayRef);
-    var tmp_8 = main$lambda_3(currentStyleIndex, overlayRef, material, foamBumpTex, foamRoughTex);
+    var tmp_8 = main$lambda_3(currentStyleIndex, overlayRef, material, foamBumpTex);
     var overlay = new HtmlOverlay(tmp_4, tmp_5, tmp_6, tmp_7, tmp_8, main$lambda_4(gestureEngine, overlayRef));
     overlayRef._v = overlay;
     overlay.setup_2u6ser_k$();
@@ -432,12 +441,12 @@
     var tmp_11 = document;
     tmp_11.addEventListener('keydown', main$lambda_7(sound), {once: true});
     var tmp_12 = document;
-    tmp_12.addEventListener('touchstart', main$lambda_8(sound, mouseVec, raycaster, camera, blob, deformController, recentPokes, clock, soundEnabled));
+    tmp_12.addEventListener('touchstart', main$lambda_8(sound, mouseVec, raycaster, camera, blob, deformController, waveSystem, recentPokes, clock, soundEnabled));
     main$applyBallColor(currentColor, currentColorIndex);
     main$applyTheme(currentThemeIndex);
     main$applyScale(currentScaleIndex);
-    main$applyStyle(currentStyleIndex, material, foamBumpTex, foamRoughTex);
-    main$animate(clock, overlay, recentPokes, rimLight, quoteTimer, inputHandler, quoteInterval, lastWasIdle, quoteDisplayTimer, quoteDisplayDuration, deformController, soundEnabled, sound, currentColorIndex, squishSoundCooldown, springPhysics, gestureEngine, gesturePokeCooldown, mouseVec, raycaster, camera, blob, currentThemeIndex, currentStyleIndex, colorAttr, currentColor, geometry, vertexCount, posAttr, shadow, renderer, scene);
+    main$applyStyle(currentStyleIndex, material, foamBumpTex);
+    main$animate(clock, overlay, recentPokes, rimLight, quoteTimer, inputHandler, quoteInterval, lastWasIdle, quoteDisplayTimer, quoteDisplayDuration, deformController, waveSystem, soundEnabled, sound, currentColorIndex, squishSoundCooldown, springPhysics, gestureEngine, gesturePokeCooldown, mouseVec, raycaster, camera, blob, currentThemeIndex, vertexCount, posAttr, geometry, currentStyleIndex, colorAttr, currentColor, shadow, renderer, scene);
   }
   function main$hash(ix, iy) {
     var n = imul(ix, 374761393) + imul(iy, 668265263) | 0;
@@ -522,71 +531,83 @@
       body.classList.add(scale);
     }
   }
-  function main$applyStyle(currentStyleIndex, material, foamBumpTex, foamRoughTex) {
+  function main$applyStyle(currentStyleIndex, material, foamBumpTex) {
     switch (currentStyleIndex._v) {
       case 0:
-        material.roughness = 0.06;
-        material.metalness = 0.02;
+        material.roughness = 0.02;
+        material.metalness = 0.0;
         material.clearcoat = 1.0;
-        material.clearcoatRoughness = 0.02;
-        material.sheen = 0.3;
-        material.sheenRoughness = 0.2;
+        material.clearcoatRoughness = 0.01;
+        material.sheen = 0.0;
+        material.sheenRoughness = 0.0;
         material.iridescence = 0.15;
-        material.iridescenceIOR = 1.5;
+        material.iridescenceIOR = 1.33;
+        material.transmission = 0.85;
+        material.thickness = 1.5;
+        material.ior = 1.33;
         material.transparent = true;
-        material.opacity = 0.72;
+        material.opacity = 0.95;
         material.bumpMap = null;
         material.bumpScale = 0.0;
         material.roughnessMap = null;
-        material.envMapIntensity = 1.5;
+        material.envMapIntensity = 2.0;
         break;
       case 1:
-        material.roughness = 0.78;
+        material.roughness = 0.15;
         material.metalness = 0.0;
-        material.clearcoat = 0.15;
-        material.clearcoatRoughness = 0.7;
-        material.sheen = 0.5;
-        material.sheenRoughness = 0.7;
+        material.clearcoat = 0.8;
+        material.clearcoatRoughness = 0.1;
+        material.sheen = 0.2;
+        material.sheenRoughness = 0.4;
         material.iridescence = 0.0;
-        material.iridescenceIOR = 1.3;
-        material.transparent = false;
-        material.opacity = 1.0;
-        material.bumpMap = foamBumpTex;
-        material.bumpScale = 0.1;
-        material.roughnessMap = foamRoughTex;
-        material.envMapIntensity = 0.4;
-        break;
-      case 2:
-        material.roughness = 0.14;
-        material.metalness = 0.08;
-        material.clearcoat = 0.85;
-        material.clearcoatRoughness = 0.08;
-        material.sheen = 0.7;
-        material.sheenRoughness = 0.25;
-        material.iridescence = 1.0;
-        material.iridescenceIOR = 1.8;
+        material.iridescenceIOR = 1.5;
+        material.transmission = 0.6;
+        material.thickness = 2.5;
+        material.ior = 1.45;
         material.transparent = true;
-        material.opacity = 0.82;
+        material.opacity = 0.9;
         material.bumpMap = foamBumpTex;
-        material.bumpScale = 0.03;
+        material.bumpScale = 0.04;
         material.roughnessMap = null;
         material.envMapIntensity = 1.2;
         break;
-      case 3:
-        material.roughness = 1.0;
+      case 2:
+        material.roughness = 0.0;
         material.metalness = 0.0;
-        material.clearcoat = 0.0;
-        material.clearcoatRoughness = 1.0;
-        material.sheen = 1.0;
-        material.sheenRoughness = 0.85;
-        material.iridescence = 0.0;
-        material.iridescenceIOR = 1.3;
-        material.transparent = false;
-        material.opacity = 1.0;
-        material.bumpMap = foamBumpTex;
-        material.bumpScale = 0.18;
-        material.roughnessMap = foamRoughTex;
-        material.envMapIntensity = 0.15;
+        material.clearcoat = 1.0;
+        material.clearcoatRoughness = 0.0;
+        material.sheen = 0.0;
+        material.sheenRoughness = 0.0;
+        material.iridescence = 0.8;
+        material.iridescenceIOR = 2.0;
+        material.transmission = 0.95;
+        material.thickness = 0.5;
+        material.ior = 1.8;
+        material.transparent = true;
+        material.opacity = 0.98;
+        material.bumpMap = null;
+        material.bumpScale = 0.0;
+        material.roughnessMap = null;
+        material.envMapIntensity = 2.5;
+        break;
+      case 3:
+        material.roughness = 0.0;
+        material.metalness = 0.0;
+        material.clearcoat = 1.0;
+        material.clearcoatRoughness = 0.0;
+        material.sheen = 0.0;
+        material.sheenRoughness = 0.0;
+        material.iridescence = 1.0;
+        material.iridescenceIOR = 1.8;
+        material.transmission = 0.92;
+        material.thickness = 0.1;
+        material.ior = 1.3;
+        material.transparent = true;
+        material.opacity = 0.5;
+        material.bumpMap = null;
+        material.bumpScale = 0.0;
+        material.roughnessMap = null;
+        material.envMapIntensity = 3.0;
         break;
     }
     material.needsUpdate = true;
@@ -607,9 +628,9 @@
     }
     tmp.z = tmp_0;
   }
-  function main$animate(clock, overlay, recentPokes, rimLight, quoteTimer, inputHandler, quoteInterval, lastWasIdle, quoteDisplayTimer, quoteDisplayDuration, deformController, soundEnabled, sound, currentColorIndex, squishSoundCooldown, springPhysics, gestureEngine, gesturePokeCooldown, mouseVec, raycaster, camera, blob, currentThemeIndex, currentStyleIndex, colorAttr, currentColor, geometry, vertexCount, posAttr, shadow, renderer, scene) {
+  function main$animate(clock, overlay, recentPokes, rimLight, quoteTimer, inputHandler, quoteInterval, lastWasIdle, quoteDisplayTimer, quoteDisplayDuration, deformController, waveSystem, soundEnabled, sound, currentColorIndex, squishSoundCooldown, springPhysics, gestureEngine, gesturePokeCooldown, mouseVec, raycaster, camera, blob, currentThemeIndex, vertexCount, posAttr, geometry, currentStyleIndex, colorAttr, currentColor, shadow, renderer, scene) {
     var tmp = window;
-    tmp.requestAnimationFrame(main$animate$lambda(clock, overlay, recentPokes, rimLight, quoteTimer, inputHandler, quoteInterval, lastWasIdle, quoteDisplayTimer, quoteDisplayDuration, deformController, soundEnabled, sound, currentColorIndex, squishSoundCooldown, springPhysics, gestureEngine, gesturePokeCooldown, mouseVec, raycaster, camera, blob, currentThemeIndex, currentStyleIndex, colorAttr, currentColor, geometry, vertexCount, posAttr, shadow, renderer, scene));
+    tmp.requestAnimationFrame(main$animate$lambda(clock, overlay, recentPokes, rimLight, quoteTimer, inputHandler, quoteInterval, lastWasIdle, quoteDisplayTimer, quoteDisplayDuration, deformController, waveSystem, soundEnabled, sound, currentColorIndex, squishSoundCooldown, springPhysics, gestureEngine, gesturePokeCooldown, mouseVec, raycaster, camera, blob, currentThemeIndex, vertexCount, posAttr, geometry, currentStyleIndex, colorAttr, currentColor, shadow, renderer, scene));
     var dt = clock.getDelta();
     var elapsed = clock.getElapsedTime();
     overlay.updateBreathing_s8fab_k$(dt);
@@ -646,6 +667,7 @@
     if (currentSection === 'deform') {
       if (inputHandler.get_pressedKeys_ih6nn7_k$().contains_aljjnj_k$(' ')) {
         deformController.applyPulse_36v9qd_k$();
+        waveSystem.excite_wki8fu_k$(0.0, 0.5, 0.0, 1.0);
         if (soundEnabled._v) {
           sound.playPulse_95m7zp_k$();
         }
@@ -653,6 +675,7 @@
       }
       if (inputHandler.get_pressedKeys_ih6nn7_k$().contains_aljjnj_k$('r') ? true : inputHandler.get_pressedKeys_ih6nn7_k$().contains_aljjnj_k$('R')) {
         deformController.reset_5u6xz3_k$();
+        waveSystem.reset_5u6xz3_k$();
         if (soundEnabled._v) {
           sound.playReset_ow4azv_k$();
         }
@@ -675,10 +698,10 @@
         squishSoundCooldown._v = 0.15;
       }
       if (!deformController.isDeforming_189jhv_k$()) {
-        springPhysics.decayTargets_x935js_k$(1.8, dt);
+        springPhysics.decayTargets_x935js_k$(1.0, dt);
       }
     } else {
-      springPhysics.decayTargets_x935js_k$(1.8, dt);
+      springPhysics.decayTargets_x935js_k$(1.0, dt);
     }
     gestureEngine.update_1d1qib_k$(dt);
     if (gestureEngine.get_enabled_pcr8o8_k$() ? gestureEngine.get_handDetected_ht26cm_k$() : false) {
@@ -717,6 +740,7 @@
                 var tmp_3 = intersects[0].point;
                 var pt = tmp_3 instanceof Vector3 ? tmp_3 : THROW_CCE();
                 deformController.applyPoke_o7qqd_k$(pt, 0.8, -0.3);
+                waveSystem.excite_wki8fu_k$(-pt.x * 0.1, -pt.y * 0.1, -pt.z * 0.1, 0.4);
                 recentPokes.add_utx5q5_k$(new PokeEvent(pt.x, pt.y, pt.z, elapsed));
                 if (recentPokes.get_size_woubt6_k$() > 8) {
                   recentPokes.removeAt_6niowx_k$(0);
@@ -741,6 +765,7 @@
           case 4:
             if (gestureEngine.shouldReset_7lex7o_k$()) {
               deformController.reset_5u6xz3_k$();
+              waveSystem.reset_5u6xz3_k$();
               if (soundEnabled._v) {
                 sound.playReset_ow4azv_k$();
               }
@@ -760,6 +785,7 @@
           case 7:
             if (gestureEngine.shouldExplode_m9cnrm_k$()) {
               deformController.applyExplode_n114xp_k$();
+              waveSystem.excite_wki8fu_k$(0.5, 0.8, 0.3, 3.0);
               if (soundEnabled._v) {
                 sound.playExplode_jvw69v_k$();
               }
@@ -778,8 +804,92 @@
           case 9:
             if (gestureEngine.shouldPunch_7m8edh_k$()) {
               deformController.applyPunch_uqw8g_k$(-gestureEngine.get_handDeltaX_68bc7c_k$() * 20.0, -gestureEngine.get_handDeltaY_68bc7b_k$() * 20.0);
+              waveSystem.excite_wki8fu_k$(-gestureEngine.get_handDeltaX_68bc7c_k$(), -gestureEngine.get_handDeltaY_68bc7b_k$(), -0.3, 2.0);
               if (soundEnabled._v) {
                 sound.playPunch_s2vzbe_k$();
+              }
+            }
+
+            break;
+          case 10:
+            if (gesturePokeCooldown._v <= 0.0 ? gestureEngine.get_pinchAmount_pmvww9_k$() > 0.3 : false) {
+              var tmp2_container = gestureEngine.getFingerNDC_8gqdfy_k$();
+              var ndcX_0 = tmp2_container.component1_7eebsc_k$();
+              var ndcY_0 = tmp2_container.component2_7eebsb_k$();
+              mouseVec.set(ndcX_0, ndcY_0);
+              raycaster.setFromCamera(mouseVec, camera);
+              var intersects_0 = raycaster.intersectObject(blob);
+              // Inline function 'kotlin.collections.isNotEmpty' call
+              // Inline function 'kotlin.collections.isEmpty' call
+              if (!(intersects_0.length === 0)) {
+                var tmp_4 = intersects_0[0].point;
+                var pt_0 = tmp_4 instanceof Vector3 ? tmp_4 : THROW_CCE();
+                deformController.applyPinch$default_i6nkjs_k$(pt_0, gestureEngine.get_pinchAmount_pmvww9_k$());
+                recentPokes.add_utx5q5_k$(new PokeEvent(pt_0.x, pt_0.y, pt_0.z, elapsed));
+                if (recentPokes.get_size_woubt6_k$() > 8) {
+                  recentPokes.removeAt_6niowx_k$(0);
+                }
+              }
+              if (soundEnabled._v ? squishSoundCooldown._v <= 0.0 : false) {
+                sound.playPinch_ujf980_k$(gestureEngine.get_pinchAmount_pmvww9_k$());
+                squishSoundCooldown._v = 0.1;
+              }
+              gesturePokeCooldown._v = 0.08;
+            }
+
+            break;
+          case 11:
+            if (gestureEngine.shouldPull_4ttkdk_k$()) {
+              var tmp3_container = gestureEngine.getFingerNDC_8gqdfy_k$();
+              var ndcX_1 = tmp3_container.component1_7eebsc_k$();
+              var ndcY_1 = tmp3_container.component2_7eebsb_k$();
+              mouseVec.set(ndcX_1, ndcY_1);
+              raycaster.setFromCamera(mouseVec, camera);
+              var intersects_1 = raycaster.intersectObject(blob);
+              // Inline function 'kotlin.collections.isNotEmpty' call
+              // Inline function 'kotlin.collections.isEmpty' call
+              if (!(intersects_1.length === 0)) {
+                var tmp_5 = intersects_1[0].point;
+                var pt_1 = tmp_5 instanceof Vector3 ? tmp_5 : THROW_CCE();
+                deformController.applyPull$default_f0dg99_k$(pt_1, -gestureEngine.get_handDeltaX_68bc7c_k$() * 15.0, -gestureEngine.get_handDeltaY_68bc7b_k$() * 15.0);
+                recentPokes.add_utx5q5_k$(new PokeEvent(pt_1.x, pt_1.y, pt_1.z, elapsed));
+                if (recentPokes.get_size_woubt6_k$() > 8) {
+                  recentPokes.removeAt_6niowx_k$(0);
+                }
+              }
+              if (soundEnabled._v) {
+                sound.playPull_t772yx_k$();
+              }
+            }
+
+            break;
+          case 12:
+            if (gestureEngine.shouldSlap_4trucl_k$()) {
+              deformController.applySlap_58en5m_k$(-gestureEngine.get_handDeltaX_68bc7c_k$() * 15.0, -gestureEngine.get_handDeltaY_68bc7b_k$() * 15.0);
+              waveSystem.excite_wki8fu_k$(-gestureEngine.get_handDeltaX_68bc7c_k$(), -gestureEngine.get_handDeltaY_68bc7b_k$(), -0.3, 1.5);
+              if (soundEnabled._v) {
+                sound.playSlap_knuq0k_k$();
+              }
+            }
+
+            break;
+          case 13:
+            deformController.applyKnead_eafvvl_k$(gestureEngine.get_kneadIntensity_csrpe1_k$() * get_PI() * 2.0, 0.8, dt);
+            if (soundEnabled._v ? squishSoundCooldown._v <= 0.0 : false) {
+              sound.playKnead_ezbs0v_k$();
+              squishSoundCooldown._v = 0.3;
+            }
+
+            break;
+          case 14:
+            var resizeDelta = gestureEngine.get_twoHandResizeDelta_jd4hle_k$();
+            // Inline function 'kotlin.math.abs' call
+
+            if (Math.abs(resizeDelta) > 0.001) {
+              deformController.applyResize_cym5e6_k$(resizeDelta * 8.0, dt);
+              if (soundEnabled._v ? squishSoundCooldown._v <= 0.0 : false) {
+                sound.playResize_x2q2wj_k$(resizeDelta > 0.0);
+                squishSoundCooldown._v = 0.15;
               }
             }
 
@@ -804,25 +914,25 @@
       inputHandler.get_pressedKeys_ih6nn7_k$().remove_cedx0m_k$('t');
       inputHandler.get_pressedKeys_ih6nn7_k$().remove_cedx0m_k$('T');
     }
-    var tmp2_container = inputHandler.updateRotationInertia_b6ha8j_k$(dt);
-    var rotX = tmp2_container.component1_7eebsc_k$();
-    var rotY = tmp2_container.component2_7eebsb_k$();
+    var tmp4_container = inputHandler.updateRotationInertia_b6ha8j_k$(dt);
+    var rotX = tmp4_container.component1_7eebsc_k$();
+    var rotY = tmp4_container.component2_7eebsb_k$();
     if (!(rotX === 0.0) ? true : !(rotY === 0.0)) {
-      var tmp3_this = blob.rotation;
-      tmp3_this.x = tmp3_this.x + rotX;
-      var tmp4_this = blob.rotation;
-      tmp4_this.y = tmp4_this.y + rotY;
-    } else if ((gestureEngine.get_enabled_pcr8o8_k$() ? gestureEngine.get_handDetected_ht26cm_k$() : false) ? gestureEngine.get_currentGesture_5tp4t5_k$().equals(HandGesture_NONE_getInstance()) : false) {
-      var tmp5_container = gestureEngine.getRotationDelta_ep2l7g_k$();
-      var gRotX = tmp5_container.component1_7eebsc_k$();
-      var gRotY = tmp5_container.component2_7eebsb_k$();
+      var tmp5_this = blob.rotation;
+      tmp5_this.x = tmp5_this.x + rotX;
       var tmp6_this = blob.rotation;
-      tmp6_this.x = tmp6_this.x + gRotX;
-      var tmp7_this = blob.rotation;
-      tmp7_this.y = tmp7_this.y + gRotY;
-    } else if (!inputHandler.get_isMouseDown_ryhimk_k$()) {
+      tmp6_this.y = tmp6_this.y + rotY;
+    } else if ((gestureEngine.get_enabled_pcr8o8_k$() ? gestureEngine.get_handDetected_ht26cm_k$() : false) ? gestureEngine.get_currentGesture_5tp4t5_k$().equals(HandGesture_NONE_getInstance()) : false) {
+      var tmp7_container = gestureEngine.getRotationDelta_ep2l7g_k$();
+      var gRotX = tmp7_container.component1_7eebsc_k$();
+      var gRotY = tmp7_container.component2_7eebsb_k$();
       var tmp8_this = blob.rotation;
-      tmp8_this.y = tmp8_this.y + (currentSection === 'calm' ? 6.0E-4 : 0.0015);
+      tmp8_this.x = tmp8_this.x + gRotX;
+      var tmp9_this = blob.rotation;
+      tmp9_this.y = tmp9_this.y + gRotY;
+    } else if (!inputHandler.get_isMouseDown_ryhimk_k$()) {
+      var tmp10_this = blob.rotation;
+      tmp10_this.y = tmp10_this.y + (currentSection === 'calm' ? 6.0E-4 : 0.0015);
     }
     // Inline function 'kotlin.math.sin' call
     var x_2 = elapsed * 0.5;
@@ -831,13 +941,13 @@
     var idleTime = inputHandler.timeSinceLastInteraction_mmcakx_k$();
     var isIdle = idleTime > 5.0 ? !(gestureEngine.get_enabled_pcr8o8_k$() ? gestureEngine.get_handDetected_ht26cm_k$() : false) : false;
     if (isIdle ? true : currentSection === 'calm') {
-      var tmp_4 = blob.position;
+      var tmp_6 = blob.position;
       // Inline function 'kotlin.math.sin' call
       var x_3 = elapsed * 0.8;
-      tmp_4.y = Math.sin(x_3) * 0.04;
+      tmp_6.y = Math.sin(x_3) * 0.04;
     } else {
-      var tmp9_this = blob.position;
-      tmp9_this.y = tmp9_this.y + (0.0 - blob.position.y) * 0.05;
+      var tmp11_this = blob.position;
+      tmp11_this.y = tmp11_this.y + (0.0 - blob.position.y) * 0.05;
     }
     var scroll = inputHandler.consumeScrollDelta_2ma375_k$();
     if (!(scroll === 0.0)) {
@@ -848,14 +958,15 @@
       if (!(click == null)) {
         mouseVec.set(click.get_first_irdx8n_k$(), click.get_second_jf7fjx_k$());
         raycaster.setFromCamera(mouseVec, camera);
-        var intersects_0 = raycaster.intersectObject(blob);
+        var intersects_2 = raycaster.intersectObject(blob);
         // Inline function 'kotlin.collections.isNotEmpty' call
         // Inline function 'kotlin.collections.isEmpty' call
-        if (!(intersects_0.length === 0)) {
-          var tmp_5 = intersects_0[0].point;
-          var pt_0 = tmp_5 instanceof Vector3 ? tmp_5 : THROW_CCE();
-          deformController.applyPoke$default_vza19u_k$(pt_0);
-          recentPokes.add_utx5q5_k$(new PokeEvent(pt_0.x, pt_0.y, pt_0.z, elapsed));
+        if (!(intersects_2.length === 0)) {
+          var tmp_7 = intersects_2[0].point;
+          var pt_2 = tmp_7 instanceof Vector3 ? tmp_7 : THROW_CCE();
+          deformController.applyPoke$default_vza19u_k$(pt_2);
+          waveSystem.excite_wki8fu_k$(-pt_2.x * 0.15, -pt_2.y * 0.15, -pt_2.z * 0.15, 0.6);
+          recentPokes.add_utx5q5_k$(new PokeEvent(pt_2.x, pt_2.y, pt_2.z, elapsed));
           if (recentPokes.get_size_woubt6_k$() > 8) {
             recentPokes.removeAt_6niowx_k$(0);
           }
@@ -868,11 +979,50 @@
       inputHandler.consumeClick_em1q8k_k$();
     }
     springPhysics.update_1d1qib_k$(dt);
-    if (springPhysics.get_maxOffset_353uky_k$() > 1.2) {
-      springPhysics.set_maxOffset_v40oe4_k$(coerceAtLeast(springPhysics.get_maxOffset_353uky_k$() - dt * 1.5, 1.2));
+    waveSystem.update_1d1qib_k$(dt);
+    if (waveSystem.get_totalEnergy_4zve65_k$() > 0.001) {
+      var inductionVariable = 0;
+      if (inductionVariable < vertexCount)
+        do {
+          var v = inductionVariable;
+          inductionVariable = inductionVariable + 1 | 0;
+          var wox = springPhysics.getOriginalX_7i9a61_k$(v);
+          var woy = springPhysics.getOriginalY_765dqy_k$(v);
+          var woz = springPhysics.getOriginalZ_6u1hbv_k$(v);
+          // Inline function 'kotlin.math.sqrt' call
+          var x_4 = wox * wox + woy * woy + woz * woz;
+          var wlen = Math.sqrt(x_4);
+          if (wlen > 0.001) {
+            var wnx = wox / wlen;
+            var wny = woy / wlen;
+            var wnz = woz / wlen;
+            var wr = waveSystem.getRadialOffset_hh3rni_k$(wnx, wny, wnz);
+            // Inline function 'org.khronos.webgl.set' call
+            // Inline function 'org.khronos.webgl.get' call
+            // Inline function 'kotlin.js.asDynamic' call
+            // Inline function 'kotlin.js.asDynamic' call
+            posAttr.array[imul(v, 3)] = posAttr.array[imul(v, 3)] + wnx * wr;
+            // Inline function 'org.khronos.webgl.set' call
+            // Inline function 'org.khronos.webgl.get' call
+            // Inline function 'kotlin.js.asDynamic' call
+            // Inline function 'kotlin.js.asDynamic' call
+            posAttr.array[imul(v, 3) + 1 | 0] = posAttr.array[imul(v, 3) + 1 | 0] + wny * wr;
+            // Inline function 'org.khronos.webgl.set' call
+            // Inline function 'org.khronos.webgl.get' call
+            // Inline function 'kotlin.js.asDynamic' call
+            // Inline function 'kotlin.js.asDynamic' call
+            posAttr.array[imul(v, 3) + 2 | 0] = posAttr.array[imul(v, 3) + 2 | 0] + wnz * wr;
+          }
+        }
+         while (inductionVariable < vertexCount);
+      posAttr.needsUpdate = true;
+      geometry.computeVertexNormals();
     }
-    if (springPhysics.get_maxVelocity_brqzug_k$() > 6.0) {
-      springPhysics.set_maxVelocity_9qwoc2_k$(coerceAtLeast(springPhysics.get_maxVelocity_brqzug_k$() - dt * 7.0, 6.0));
+    if (springPhysics.get_maxOffset_353uky_k$() > 2.0) {
+      springPhysics.set_maxOffset_v40oe4_k$(coerceAtLeast(springPhysics.get_maxOffset_353uky_k$() - dt * 1.5, 2.0));
+    }
+    if (springPhysics.get_maxVelocity_brqzug_k$() > 10.0) {
+      springPhysics.set_maxVelocity_9qwoc2_k$(coerceAtLeast(springPhysics.get_maxVelocity_brqzug_k$() - dt * 7.0, 10.0));
     }
     if (soundEnabled._v) {
       sound.updateDrone_vo5709_k$(coerceAtMost(springPhysics.get_totalEnergy_4zve65_k$(), 2.0) / 2.0);
@@ -884,156 +1034,165 @@
     var compressStr;
     var stretchStr;
     var driftAmp;
+    var causticStr;
     var frTintR;
     var frTintG;
     var frTintB;
     var pearlescent;
     switch (currentStyleIndex._v) {
       case 0:
-        fresnelStr = 0.35;
-        subsurfaceStr = 0.12;
-        rippleStr = 0.35;
-        shimmerAmp = 0.05;
-        compressStr = 0.15;
-        stretchStr = 0.25;
-        driftAmp = 0.06;
+        fresnelStr = 0.5;
+        subsurfaceStr = 0.06;
+        rippleStr = 0.4;
+        shimmerAmp = 0.03;
+        compressStr = 0.2;
+        stretchStr = 0.3;
+        driftAmp = 0.04;
+        causticStr = 0.25;
         frTintR = 0.7;
-        frTintG = 0.82;
+        frTintG = 0.85;
         frTintB = 1.0;
         pearlescent = false;
         break;
       case 1:
-        fresnelStr = 0.1;
-        subsurfaceStr = 0.03;
-        rippleStr = 0.15;
-        shimmerAmp = 0.02;
-        compressStr = 0.28;
-        stretchStr = 0.12;
-        driftAmp = 0.03;
-        frTintR = 0.92;
-        frTintG = 0.88;
-        frTintB = 0.78;
+        fresnelStr = 0.2;
+        subsurfaceStr = 0.15;
+        rippleStr = 0.25;
+        shimmerAmp = 0.04;
+        compressStr = 0.25;
+        stretchStr = 0.15;
+        driftAmp = 0.05;
+        causticStr = 0.12;
+        frTintR = 0.85;
+        frTintG = 0.9;
+        frTintB = 0.8;
         pearlescent = false;
         break;
       case 2:
-        fresnelStr = 0.45;
-        subsurfaceStr = 0.08;
-        rippleStr = 0.4;
-        shimmerAmp = 0.08;
-        compressStr = 0.12;
-        stretchStr = 0.2;
-        driftAmp = 0.07;
+        fresnelStr = 0.6;
+        subsurfaceStr = 0.04;
+        rippleStr = 0.5;
+        shimmerAmp = 0.06;
+        compressStr = 0.1;
+        stretchStr = 0.25;
+        driftAmp = 0.05;
+        causticStr = 0.35;
         frTintR = 0.8;
-        frTintG = 0.7;
+        frTintG = 0.75;
         frTintB = 1.0;
         pearlescent = true;
         break;
       default:
-        fresnelStr = 0.08;
-        subsurfaceStr = 0.18;
-        rippleStr = 0.1;
-        shimmerAmp = 0.025;
-        compressStr = 0.1;
-        stretchStr = 0.08;
-        driftAmp = 0.03;
-        frTintR = 0.92;
-        frTintG = 0.9;
-        frTintB = 0.84;
-        pearlescent = false;
+        fresnelStr = 0.7;
+        subsurfaceStr = 0.02;
+        rippleStr = 0.3;
+        shimmerAmp = 0.08;
+        compressStr = 0.05;
+        stretchStr = 0.15;
+        driftAmp = 0.06;
+        causticStr = 0.15;
+        frTintR = 0.9;
+        frTintG = 0.85;
+        frTintB = 1.0;
+        pearlescent = true;
         break;
     }
     var colors = colorAttr.array;
     var baseR = currentColor._v.r_1;
     var baseG = currentColor._v.g_1;
     var baseB = currentColor._v.b_1;
-    var tmp_6 = geometry.getAttribute('normal');
-    var normalAttr = tmp_6 instanceof BufferAttribute ? tmp_6 : THROW_CCE();
+    var tmp_8 = geometry.getAttribute('normal');
+    var normalAttr = tmp_8 instanceof BufferAttribute ? tmp_8 : THROW_CCE();
     var camZ = camera.position.z;
-    var inductionVariable = 0;
-    if (inductionVariable < vertexCount)
+    var inductionVariable_0 = 0;
+    if (inductionVariable_0 < vertexCount)
       do {
-        var v = inductionVariable;
-        inductionVariable = inductionVariable + 1 | 0;
+        var v_0 = inductionVariable_0;
+        inductionVariable_0 = inductionVariable_0 + 1 | 0;
         // Inline function 'org.khronos.webgl.get' call
         // Inline function 'kotlin.js.asDynamic' call
-        var px = posAttr.array[imul(v, 3)];
+        var px = posAttr.array[imul(v_0, 3)];
         // Inline function 'org.khronos.webgl.get' call
         // Inline function 'kotlin.js.asDynamic' call
-        var py = posAttr.array[imul(v, 3) + 1 | 0];
+        var py = posAttr.array[imul(v_0, 3) + 1 | 0];
         // Inline function 'org.khronos.webgl.get' call
         // Inline function 'kotlin.js.asDynamic' call
-        var pz = posAttr.array[imul(v, 3) + 2 | 0];
-        var nx = normalAttr.getX(v);
-        var ny = normalAttr.getY(v);
-        var nz = normalAttr.getZ(v);
+        var pz = posAttr.array[imul(v_0, 3) + 2 | 0];
+        var nx = normalAttr.getX(v_0);
+        var ny = normalAttr.getY(v_0);
+        var nz = normalAttr.getZ(v_0);
         var vdx = -px;
         var vdy = -py;
         var vdz = camZ - pz;
         // Inline function 'kotlin.math.sqrt' call
-        var x_4 = vdx * vdx + vdy * vdy + vdz * vdz;
-        var vdLen = Math.sqrt(x_4);
+        var x_5 = vdx * vdx + vdy * vdy + vdz * vdz;
+        var vdLen = Math.sqrt(x_5);
         var dotNV = vdLen > 0.001 ? (nx * vdx + ny * vdy + nz * vdz) / vdLen : 1.0;
         // Inline function 'kotlin.math.abs' call
-        var tmp$ret$16 = Math.abs(dotNV);
-        var fresnelRaw = coerceIn_0(1.0 - tmp$ret$16, 0.0, 1.0);
+        var tmp$ret$31 = Math.abs(dotNV);
+        var fresnelRaw = coerceIn_0(1.0 - tmp$ret$31, 0.0, 1.0);
         var fresnel = fresnelRaw * fresnelRaw * fresnelStr;
         var fgR;
         var fgG;
         var fgB;
         if (pearlescent) {
-          var ox = springPhysics.getOriginalX_7i9a61_k$(v);
-          var tmp_7 = fresnelRaw * 3.0;
+          var ox = springPhysics.getOriginalX_7i9a61_k$(v_0);
+          var tmp_9 = fresnelRaw * 3.0;
           // Inline function 'kotlin.math.sin' call
-          var tmp_8 = elapsed * 0.2;
+          var tmp_10 = elapsed * 0.2;
           // Inline function 'kotlin.math.sqrt' call
-          var x_5 = ox * ox + py * py;
-          var x_6 = tmp_8 + Math.sqrt(x_5) * 2.0;
-          var hueAngle = tmp_7 + Math.sin(x_6);
+          var x_6 = ox * ox + py * py;
+          var x_7 = tmp_10 + Math.sqrt(x_6) * 2.0;
+          var hueAngle = tmp_9 + Math.sin(x_7);
           // Inline function 'kotlin.math.sin' call
           fgR = (Math.sin(hueAngle) * 0.5 + 0.5) * fresnel;
           // Inline function 'kotlin.math.sin' call
-          var x_7 = hueAngle + 2.094;
-          fgG = (Math.sin(x_7) * 0.5 + 0.5) * fresnel;
+          var x_8 = hueAngle + 2.094;
+          fgG = (Math.sin(x_8) * 0.5 + 0.5) * fresnel;
           // Inline function 'kotlin.math.sin' call
-          var x_8 = hueAngle + 4.189;
-          fgB = (Math.sin(x_8) * 0.5 + 0.5) * fresnel;
+          var x_9 = hueAngle + 4.189;
+          fgB = (Math.sin(x_9) * 0.5 + 0.5) * fresnel;
         } else {
           fgR = fresnel * frTintR;
           fgG = fresnel * frTintG;
           fgB = fresnel * frTintB;
         }
         // Inline function 'kotlin.math.abs' call
-        var tmp$ret$22 = Math.abs(dotNV);
-        var sss = coerceIn_0(tmp$ret$22, 0.0, 1.0) * subsurfaceStr;
+        var tmp$ret$37 = Math.abs(dotNV);
+        var sss = coerceIn_0(tmp$ret$37, 0.0, 1.0) * subsurfaceStr;
         var sssR = sss * 1.1;
         var sssG = sss * 0.7;
         var sssB = sss * 0.4;
-        var ox_0 = springPhysics.getOriginalX_7i9a61_k$(v);
-        var oy = springPhysics.getOriginalY_765dqy_k$(v);
-        var oz = springPhysics.getOriginalZ_6u1hbv_k$(v);
+        var ox_0 = springPhysics.getOriginalX_7i9a61_k$(v_0);
+        var oy = springPhysics.getOriginalY_765dqy_k$(v_0);
+        var oz = springPhysics.getOriginalZ_6u1hbv_k$(v_0);
         // Inline function 'kotlin.math.sqrt' call
-        var x_9 = ox_0 * ox_0 + oy * oy + oz * oz;
-        var dist = Math.sqrt(x_9);
+        var x_10 = ox_0 * ox_0 + oy * oy + oz * oz;
+        var dist = Math.sqrt(x_10);
         var radial = 1.0 - coerceIn_0(dist / 2.2, 0.0, 1.0) * 0.25;
         var vertical = 1.0 + coerceIn_0(oy / 2.5, -1.0, 1.0) * 0.14;
         // Inline function 'kotlin.math.sin' call
-        var x_10 = elapsed * 0.25 + dist * 1.2 + oy * 0.8;
-        var drift1 = Math.sin(x_10) * driftAmp;
+        var x_11 = elapsed * 0.25 + dist * 1.2 + oy * 0.8;
+        var drift1 = Math.sin(x_11) * driftAmp;
         // Inline function 'kotlin.math.cos' call
-        var x_11 = elapsed * 0.18 + ox_0 * 1.5;
-        var drift2 = Math.cos(x_11) * driftAmp * 0.7;
+        var x_12 = elapsed * 0.18 + ox_0 * 1.5;
+        var drift2 = Math.cos(x_12) * driftAmp * 0.7;
         var shimX = ox_0 * 2.0 + elapsed * 0.12;
         var shimY = oz * 2.0 + elapsed * 0.1;
         var shimmer = (main$smoothNoise(shimX, shimY) - 0.5) * shimmerAmp;
+        var caustScale = 3.0;
+        var c1 = main$smoothNoise(ox_0 * caustScale + elapsed * 0.3, oz * caustScale + elapsed * 0.2);
+        var c2 = main$smoothNoise(oy * caustScale * 1.5 - elapsed * 0.25, oz * caustScale * 1.5 + elapsed * 0.15);
+        var caustic = coerceIn_0((c1 + c2 - 0.8) * 3.0, 0.0, 1.0) * causticStr;
         // Inline function 'org.khronos.webgl.get' call
         // Inline function 'kotlin.js.asDynamic' call
-        var deform = springPhysics.get_deformationMagnitudes_2o74bu_k$()[v];
+        var deform = springPhysics.get_deformationMagnitudes_2o74bu_k$()[v_0];
         var stretchGlow = coerceIn_0(deform / 1.0, 0.0, 1.0) * stretchStr;
         var compressFade = 1.0 - coerceIn_0(deform / 1.5, 0.0, 1.0) * compressStr;
         var rippleGlow = 0.0;
-        var tmp12_iterator = recentPokes.iterator_jk1svi_k$();
-        $l$loop: while (tmp12_iterator.hasNext_bitz1p_k$()) {
-          var poke = tmp12_iterator.next_20eer_k$();
+        var tmp15_iterator = recentPokes.iterator_jk1svi_k$();
+        $l$loop: while (tmp15_iterator.hasNext_bitz1p_k$()) {
+          var poke = tmp15_iterator.next_20eer_k$();
           var age = elapsed - poke.time_1;
           if (age < 0.0 ? true : age > 1.5)
             continue $l$loop;
@@ -1041,12 +1200,12 @@
           var dy = py - poke.y_1;
           var dz2 = pz - poke.z_1;
           // Inline function 'kotlin.math.sqrt' call
-          var x_12 = dx * dx + dy * dy + dz2 * dz2;
-          var pokeDist = Math.sqrt(x_12);
+          var x_13 = dx * dx + dy * dy + dz2 * dz2;
+          var pokeDist = Math.sqrt(x_13);
           var ringRadius = age * 2.5;
           // Inline function 'kotlin.math.abs' call
-          var x_13 = pokeDist - ringRadius;
-          var ringDist = Math.abs(x_13);
+          var x_14 = pokeDist - ringRadius;
+          var ringDist = Math.abs(x_14);
           var ringFalloff = coerceIn_0(1.0 - ringDist / 0.4, 0.0, 1.0);
           var fade = coerceIn_0(1.0 - age / 1.5, 0.0, 1.0);
           rippleGlow = rippleGlow + ringFalloff * fade * rippleStr;
@@ -1068,25 +1227,29 @@
         r = r + rippleGlow * 0.9;
         g = g + rippleGlow * 0.92;
         b = b + rippleGlow * 0.95;
+        r = r + caustic * 0.85;
+        g = g + caustic * 0.92;
+        b = b + caustic * 1.0;
         // Inline function 'org.khronos.webgl.set' call
         // Inline function 'kotlin.js.asDynamic' call
-        colors[imul(v, 3)] = coerceIn_0(r, 0.0, 1.0);
+        colors[imul(v_0, 3)] = coerceIn_0(r, 0.0, 1.0);
         // Inline function 'org.khronos.webgl.set' call
         // Inline function 'kotlin.js.asDynamic' call
-        colors[imul(v, 3) + 1 | 0] = coerceIn_0(g, 0.0, 1.0);
+        colors[imul(v_0, 3) + 1 | 0] = coerceIn_0(g, 0.0, 1.0);
         // Inline function 'org.khronos.webgl.set' call
         // Inline function 'kotlin.js.asDynamic' call
-        colors[imul(v, 3) + 2 | 0] = coerceIn_0(b, 0.0, 1.0);
+        colors[imul(v_0, 3) + 2 | 0] = coerceIn_0(b, 0.0, 1.0);
       }
-       while (inductionVariable < vertexCount);
+       while (inductionVariable_0 < vertexCount);
     colorAttr.needsUpdate = true;
     var energy = springPhysics.get_totalEnergy_4zve65_k$();
     shadow.scale.set(1.0 + energy * 0.08, 0.02, 1.0 + energy * 0.08);
     renderer.render(scene, camera);
   }
-  function main$lambda($deformController, $soundEnabled, $sound) {
+  function main$lambda($deformController, $waveSystem, $soundEnabled, $sound) {
     return function () {
       $deformController.reset_5u6xz3_k$();
+      $waveSystem.reset_5u6xz3_k$();
       var tmp;
       if ($soundEnabled._v) {
         $sound.playReset_ow4azv_k$();
@@ -1132,10 +1295,10 @@
       return Unit_getInstance();
     };
   }
-  function main$lambda_3($currentStyleIndex, $overlayRef, $material, $foamBumpTex, $foamRoughTex) {
+  function main$lambda_3($currentStyleIndex, $overlayRef, $material, $foamBumpTex) {
     return function () {
       $currentStyleIndex._v = ($currentStyleIndex._v + 1 | 0) % get_STYLE_NAMES().length | 0;
-      main$applyStyle($currentStyleIndex, $material, $foamBumpTex, $foamRoughTex);
+      main$applyStyle($currentStyleIndex, $material, $foamBumpTex);
       var tmp0_safe_receiver = $overlayRef._v;
       if (tmp0_safe_receiver == null)
         null;
@@ -1175,7 +1338,7 @@
       return Unit_getInstance();
     };
   }
-  function main$lambda_8($sound, $mouseVec, $raycaster, $camera, $blob, $deformController, $recentPokes, $clock, $soundEnabled) {
+  function main$lambda_8($sound, $mouseVec, $raycaster, $camera, $blob, $deformController, $waveSystem, $recentPokes, $clock, $soundEnabled) {
     return function (_anonymous_parameter_0__qggqh8) {
       $sound.ensureResumed_h78lih_k$();
       var touch = event.touches[0];
@@ -1195,6 +1358,7 @@
           var tmp_3 = intersects[0].point;
           var pt = tmp_3 instanceof Vector3 ? tmp_3 : THROW_CCE();
           $deformController.applyPoke$default_vza19u_k$(pt);
+          $waveSystem.excite_wki8fu_k$(-pt.x * 0.15, -pt.y * 0.15, -pt.z * 0.15, 0.6);
           $recentPokes.add_utx5q5_k$(new PokeEvent(pt.x, pt.y, pt.z, $clock.getElapsedTime()));
           if ($recentPokes.get_size_woubt6_k$() > 8) {
             $recentPokes.removeAt_6niowx_k$(0);
@@ -1211,9 +1375,9 @@
       return Unit_getInstance();
     };
   }
-  function main$animate$lambda($clock, $overlay, $recentPokes, $rimLight, $quoteTimer, $inputHandler, $quoteInterval, $lastWasIdle, $quoteDisplayTimer, $quoteDisplayDuration, $deformController, $soundEnabled, $sound, $currentColorIndex, $squishSoundCooldown, $springPhysics, $gestureEngine, $gesturePokeCooldown, $mouseVec, $raycaster, $camera, $blob, $currentThemeIndex, $currentStyleIndex, $colorAttr, $currentColor, $geometry, $vertexCount, $posAttr, $shadow, $renderer, $scene) {
+  function main$animate$lambda($clock, $overlay, $recentPokes, $rimLight, $quoteTimer, $inputHandler, $quoteInterval, $lastWasIdle, $quoteDisplayTimer, $quoteDisplayDuration, $deformController, $waveSystem, $soundEnabled, $sound, $currentColorIndex, $squishSoundCooldown, $springPhysics, $gestureEngine, $gesturePokeCooldown, $mouseVec, $raycaster, $camera, $blob, $currentThemeIndex, $vertexCount, $posAttr, $geometry, $currentStyleIndex, $colorAttr, $currentColor, $shadow, $renderer, $scene) {
     return function (it) {
-      main$animate($clock, $overlay, $recentPokes, $rimLight, $quoteTimer, $inputHandler, $quoteInterval, $lastWasIdle, $quoteDisplayTimer, $quoteDisplayDuration, $deformController, $soundEnabled, $sound, $currentColorIndex, $squishSoundCooldown, $springPhysics, $gestureEngine, $gesturePokeCooldown, $mouseVec, $raycaster, $camera, $blob, $currentThemeIndex, $currentStyleIndex, $colorAttr, $currentColor, $geometry, $vertexCount, $posAttr, $shadow, $renderer, $scene);
+      main$animate($clock, $overlay, $recentPokes, $rimLight, $quoteTimer, $inputHandler, $quoteInterval, $lastWasIdle, $quoteDisplayTimer, $quoteDisplayDuration, $deformController, $waveSystem, $soundEnabled, $sound, $currentColorIndex, $squishSoundCooldown, $springPhysics, $gestureEngine, $gesturePokeCooldown, $mouseVec, $raycaster, $camera, $blob, $currentThemeIndex, $vertexCount, $posAttr, $geometry, $currentStyleIndex, $colorAttr, $currentColor, $shadow, $renderer, $scene);
       return Unit_getInstance();
     };
   }
@@ -1229,7 +1393,7 @@
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
-      BALL_COLORS = [new BallColor('Lavender', 0.58, 0.48, 0.82), new BallColor('Soft Blue', 0.42, 0.62, 0.88), new BallColor('Teal', 0.35, 0.75, 0.72), new BallColor('Rose', 0.85, 0.48, 0.58), new BallColor('Peach', 0.92, 0.68, 0.52), new BallColor('Sage', 0.55, 0.75, 0.55), new BallColor('Sky', 0.52, 0.72, 0.92), new BallColor('Coral', 0.9, 0.52, 0.45), new BallColor('Sand', 0.82, 0.76, 0.62)];
+      BALL_COLORS = [new BallColor('Clear', 0.82, 0.9, 0.96), new BallColor('Aqua', 0.4, 0.8, 0.92), new BallColor('Ocean', 0.22, 0.52, 0.88), new BallColor('Rose', 0.92, 0.55, 0.65), new BallColor('Lime', 0.5, 0.88, 0.45), new BallColor('Sunset', 0.95, 0.62, 0.35), new BallColor('Grape', 0.58, 0.38, 0.85), new BallColor('Crystal', 0.9, 0.9, 0.95), new BallColor('Teal', 0.3, 0.78, 0.72)];
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
@@ -1245,7 +1409,7 @@
       // Inline function 'kotlin.arrayOf' call
       // Inline function 'kotlin.js.unsafeCast' call
       // Inline function 'kotlin.js.asDynamic' call
-      STYLE_NAMES = ['Calm Jelly', 'Soft Silicone', 'Pearl Dream', 'Cloud Foam'];
+      STYLE_NAMES = ['Water Balloon', 'Gel Ball', 'Crystal Drop', 'Soap Bubble'];
     }
   }
   function _get_ctx__e66oga($this) {
@@ -1816,6 +1980,147 @@
     pop.start(now);
     pop.stop(now + 0.06);
   };
+  protoOf(SoundEngine).playPinch_ujf980_k$ = function (intensity) {
+    this.ensureResumed_h78lih_k$();
+    var tmp = this.ctx_1.currentTime;
+    var now = (!(tmp == null) ? typeof tmp === 'number' : false) ? tmp : THROW_CCE();
+    var freq = 300.0 + intensity * 400.0;
+    var osc = this.ctx_1.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+    var gain = this.ctx_1.createGain();
+    gain.gain.setValueAtTime(0.08 * intensity, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    var filter = this.ctx_1.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, now);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx_1.destination);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  };
+  protoOf(SoundEngine).playSlap_knuq0k_k$ = function () {
+    this.ensureResumed_h78lih_k$();
+    var tmp = this.ctx_1.currentTime;
+    var now = (!(tmp == null) ? typeof tmp === 'number' : false) ? tmp : THROW_CCE();
+    var tmp_0 = this.ctx_1.sampleRate;
+    var sr = (!(tmp_0 == null) ? typeof tmp_0 === 'number' : false) ? tmp_0 : THROW_CCE();
+    var crackSize = numberToInt(sr * 0.02);
+    var crackBuf = this.ctx_1.createBuffer(1, crackSize, this.ctx_1.sampleRate);
+    var crackData = crackBuf.getChannelData(0);
+    var inductionVariable = 0;
+    if (inductionVariable < crackSize)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        crackData[i] = (Default_getInstance().nextDouble_s2xvfg_k$() * 2.0 - 1.0) * 0.4;
+      }
+       while (inductionVariable < crackSize);
+    var crack = this.ctx_1.createBufferSource();
+    crack.buffer = crackBuf;
+    var crackFilter = this.ctx_1.createBiquadFilter();
+    crackFilter.type = 'bandpass';
+    crackFilter.frequency.setValueAtTime(2500, now);
+    crackFilter.Q.setValueAtTime(2.0, now);
+    var crackGain = this.ctx_1.createGain();
+    crackGain.gain.setValueAtTime(0.2, now);
+    crackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    crack.connect(crackFilter);
+    crackFilter.connect(crackGain);
+    crackGain.connect(this.ctx_1.destination);
+    crack.start(now);
+    crack.stop(now + 0.08);
+    var ring = this.ctx_1.createOscillator();
+    ring.type = 'sine';
+    ring.frequency.setValueAtTime(400, now);
+    ring.frequency.exponentialRampToValueAtTime(200, now + 0.2);
+    var ringGain = this.ctx_1.createGain();
+    ringGain.gain.setValueAtTime(0.06, now);
+    ringGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    ring.connect(ringGain);
+    ringGain.connect(this.ctx_1.destination);
+    ring.start(now);
+    ring.stop(now + 0.3);
+  };
+  protoOf(SoundEngine).playKnead_ezbs0v_k$ = function () {
+    this.ensureResumed_h78lih_k$();
+    var tmp = this.ctx_1.currentTime;
+    var now = (!(tmp == null) ? typeof tmp === 'number' : false) ? tmp : THROW_CCE();
+    var osc = this.ctx_1.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(80, now);
+    osc.frequency.linearRampToValueAtTime(120, now + 0.15);
+    osc.frequency.linearRampToValueAtTime(80, now + 0.3);
+    var gain = this.ctx_1.createGain();
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    var filter = this.ctx_1.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(200, now);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx_1.destination);
+    osc.start(now);
+    osc.stop(now + 0.4);
+  };
+  protoOf(SoundEngine).playResize_x2q2wj_k$ = function (expanding) {
+    this.ensureResumed_h78lih_k$();
+    var tmp = this.ctx_1.currentTime;
+    var now = (!(tmp == null) ? typeof tmp === 'number' : false) ? tmp : THROW_CCE();
+    var tmp_0 = this.ctx_1.sampleRate;
+    var sr = (!(tmp_0 == null) ? typeof tmp_0 === 'number' : false) ? tmp_0 : THROW_CCE();
+    var noiseSize = numberToInt(sr * 0.15);
+    var noiseBuf = this.ctx_1.createBuffer(1, noiseSize, this.ctx_1.sampleRate);
+    var noiseData = noiseBuf.getChannelData(0);
+    var inductionVariable = 0;
+    if (inductionVariable < noiseSize)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        noiseData[i] = (Default_getInstance().nextDouble_s2xvfg_k$() * 2.0 - 1.0) * 0.1;
+      }
+       while (inductionVariable < noiseSize);
+    var noise = this.ctx_1.createBufferSource();
+    noise.buffer = noiseBuf;
+    var filter = this.ctx_1.createBiquadFilter();
+    filter.type = 'bandpass';
+    if (expanding) {
+      filter.frequency.setValueAtTime(400, now);
+      filter.frequency.linearRampToValueAtTime(1200, now + 0.15);
+    } else {
+      filter.frequency.setValueAtTime(1200, now);
+      filter.frequency.linearRampToValueAtTime(400, now + 0.15);
+    }
+    filter.Q.setValueAtTime(1.5, now);
+    var gain = this.ctx_1.createGain();
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx_1.destination);
+    noise.start(now);
+    noise.stop(now + 0.25);
+  };
+  protoOf(SoundEngine).playPull_t772yx_k$ = function () {
+    this.ensureResumed_h78lih_k$();
+    var tmp = this.ctx_1.currentTime;
+    var now = (!(tmp == null) ? typeof tmp === 'number' : false) ? tmp : THROW_CCE();
+    var osc = this.ctx_1.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.2);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+    var gain = this.ctx_1.createGain();
+    gain.gain.setValueAtTime(0.07, now);
+    gain.gain.linearRampToValueAtTime(0.1, now + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    osc.connect(gain);
+    gain.connect(this.ctx_1.destination);
+    osc.start(now);
+    osc.stop(now + 0.5);
+  };
   function _get_spring__4s3m3i($this) {
     return $this.spring_1;
   }
@@ -2212,10 +2517,313 @@
       }
        while (inductionVariable < last);
   };
+  protoOf(DeformationController).applyPinch_fgwop2_k$ = function (point, pinchAmount, radius) {
+    var strength = -0.8 * pinchAmount;
+    var inductionVariable = 0;
+    var last = this.vertexCount_1;
+    if (inductionVariable < last)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        var tmp = this.spring_1.getOriginalX_7i9a61_k$(i);
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        var ox = tmp + this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)];
+        var tmp_0 = this.spring_1.getOriginalY_765dqy_k$(i);
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        var oy = tmp_0 + this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0];
+        var tmp_1 = this.spring_1.getOriginalZ_6u1hbv_k$(i);
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        var oz = tmp_1 + this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0];
+        var dx = ox - point.x;
+        var dy = oy - point.y;
+        var dz = oz - point.z;
+        // Inline function 'kotlin.math.sqrt' call
+        var x = dx * dx + dy * dy + dz * dz;
+        var dist = Math.sqrt(x);
+        if (dist < radius) {
+          // Inline function 'kotlin.math.exp' call
+          var x_0 = -(dist * dist) / (radius * radius * 0.2);
+          var falloff = Math.exp(x_0);
+          // Inline function 'kotlin.math.sqrt' call
+          var x_1 = this.spring_1.getOriginalX_7i9a61_k$(i) * this.spring_1.getOriginalX_7i9a61_k$(i) + this.spring_1.getOriginalY_765dqy_k$(i) * this.spring_1.getOriginalY_765dqy_k$(i) + this.spring_1.getOriginalZ_6u1hbv_k$(i) * this.spring_1.getOriginalZ_6u1hbv_k$(i);
+          var origLen = Math.sqrt(x_1);
+          if (origLen > 0.001) {
+            // Inline function 'org.khronos.webgl.set' call
+            // Inline function 'org.khronos.webgl.get' call
+            // Inline function 'kotlin.js.asDynamic' call
+            // Inline function 'kotlin.js.asDynamic' call
+            this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] + strength * falloff * this.spring_1.getOriginalX_7i9a61_k$(i) / origLen;
+            // Inline function 'org.khronos.webgl.set' call
+            // Inline function 'org.khronos.webgl.get' call
+            // Inline function 'kotlin.js.asDynamic' call
+            // Inline function 'kotlin.js.asDynamic' call
+            this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] + strength * falloff * this.spring_1.getOriginalY_765dqy_k$(i) / origLen;
+            // Inline function 'org.khronos.webgl.set' call
+            // Inline function 'org.khronos.webgl.get' call
+            // Inline function 'kotlin.js.asDynamic' call
+            // Inline function 'kotlin.js.asDynamic' call
+            this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] + strength * falloff * this.spring_1.getOriginalZ_6u1hbv_k$(i) / origLen;
+          }
+        }
+      }
+       while (inductionVariable < last);
+  };
+  protoOf(DeformationController).applyPinch$default_i6nkjs_k$ = function (point, pinchAmount, radius, $super) {
+    radius = radius === VOID ? 0.6 : radius;
+    var tmp;
+    if ($super === VOID) {
+      this.applyPinch_fgwop2_k$(point, pinchAmount, radius);
+      tmp = Unit_getInstance();
+    } else {
+      tmp = $super.applyPinch_fgwop2_k$.call(this, point, pinchAmount, radius);
+    }
+    return tmp;
+  };
+  protoOf(DeformationController).applyPull_jmchaf_k$ = function (point, pullDirX, pullDirY, strength) {
+    var radius = 1.5;
+    // Inline function 'kotlin.math.sqrt' call
+    var x = pullDirX * pullDirX + pullDirY * pullDirY + 0.01;
+    var pLen = Math.sqrt(x);
+    var pdx = pullDirX / pLen;
+    var pdy = pullDirY / pLen;
+    var inductionVariable = 0;
+    var last = this.vertexCount_1;
+    if (inductionVariable < last)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        var tmp = this.spring_1.getOriginalX_7i9a61_k$(i);
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        var ox = tmp + this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)];
+        var tmp_0 = this.spring_1.getOriginalY_765dqy_k$(i);
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        var oy = tmp_0 + this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0];
+        var tmp_1 = this.spring_1.getOriginalZ_6u1hbv_k$(i);
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        var oz = tmp_1 + this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0];
+        var dx = ox - point.x;
+        var dy = oy - point.y;
+        var dz = oz - point.z;
+        // Inline function 'kotlin.math.sqrt' call
+        var x_0 = dx * dx + dy * dy + dz * dz;
+        var dist = Math.sqrt(x_0);
+        if (dist < radius) {
+          // Inline function 'kotlin.math.exp' call
+          var x_1 = -(dist * dist) / (radius * radius * 0.5);
+          var falloff = Math.exp(x_1);
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] + strength * falloff * pdx;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] + strength * falloff * pdy;
+        }
+      }
+       while (inductionVariable < last);
+  };
+  protoOf(DeformationController).applyPull$default_f0dg99_k$ = function (point, pullDirX, pullDirY, strength, $super) {
+    strength = strength === VOID ? 1.2 : strength;
+    var tmp;
+    if ($super === VOID) {
+      this.applyPull_jmchaf_k$(point, pullDirX, pullDirY, strength);
+      tmp = Unit_getInstance();
+    } else {
+      tmp = $super.applyPull_jmchaf_k$.call(this, point, pullDirX, pullDirY, strength);
+    }
+    return tmp;
+  };
+  protoOf(DeformationController).applySlap_58en5m_k$ = function (dirX, dirY) {
+    this.spring_1.set_maxOffset_v40oe4_k$(2.0);
+    this.spring_1.set_maxVelocity_9qwoc2_k$(12.0);
+    // Inline function 'kotlin.math.sqrt' call
+    var x = dirX * dirX + dirY * dirY + 0.25;
+    var dLen = Math.sqrt(x);
+    var ndx = dirX / dLen;
+    var ndy = dirY / dLen;
+    var ndz = -0.5 / dLen;
+    var strength = 1.8;
+    var inductionVariable = 0;
+    var last = this.vertexCount_1;
+    if (inductionVariable < last)
+      $l$loop: do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        var ox = this.spring_1.getOriginalX_7i9a61_k$(i);
+        var oy = this.spring_1.getOriginalY_765dqy_k$(i);
+        var oz = this.spring_1.getOriginalZ_6u1hbv_k$(i);
+        // Inline function 'kotlin.math.sqrt' call
+        var x_0 = ox * ox + oy * oy + oz * oz;
+        var origLen = Math.sqrt(x_0);
+        if (origLen < 0.001)
+          continue $l$loop;
+        var dot = (ox * ndx + oy * ndy + oz * ndz) / origLen;
+        if (dot > 0.0) {
+          var push = strength * dot;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] - push * ox / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] - push * oy / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] - push * oz / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3)] = this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3)] + ndx * push * 2.0;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3) + 1 | 0] + ndy * push * 2.0;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3) + 2 | 0] = this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3) + 2 | 0] + ndz * push * 2.0;
+          var wobble = (Default_getInstance().nextDouble_s2xvfg_k$() - 0.5) * push * 0.5;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3)] = this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3)] + ndy * wobble;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_velocities_ia7mbo_k$()[imul(i, 3) + 1 | 0] - ndx * wobble;
+        } else {
+          var jiggle = strength * 0.3 * dot * dot;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] + jiggle * ox / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] + jiggle * oy / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] + jiggle * oz / origLen;
+        }
+      }
+       while (inductionVariable < last);
+  };
+  protoOf(DeformationController).applyKnead_eafvvl_k$ = function (phase, intensity, dt) {
+    var kneadStrength = 1.5 * intensity;
+    // Inline function 'kotlin.math.cos' call
+    var xFactor = Math.cos(phase) * kneadStrength;
+    // Inline function 'kotlin.math.sin' call
+    var yFactor = Math.sin(phase) * kneadStrength;
+    var inductionVariable = 0;
+    var last = this.vertexCount_1;
+    if (inductionVariable < last)
+      $l$loop: do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        var ox = this.spring_1.getOriginalX_7i9a61_k$(i);
+        var oy = this.spring_1.getOriginalY_765dqy_k$(i);
+        var oz = this.spring_1.getOriginalZ_6u1hbv_k$(i);
+        // Inline function 'kotlin.math.sqrt' call
+        var x = ox * ox + oy * oy + oz * oz;
+        var origLen = Math.sqrt(x);
+        if (origLen < 0.001)
+          continue $l$loop;
+        var xDisp = -xFactor * (ox / origLen) * dt;
+        var yDisp = yFactor * (oy / origLen) * dt;
+        // Inline function 'org.khronos.webgl.set' call
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        // Inline function 'kotlin.js.asDynamic' call
+        this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] + xDisp;
+        // Inline function 'org.khronos.webgl.set' call
+        // Inline function 'org.khronos.webgl.get' call
+        // Inline function 'kotlin.js.asDynamic' call
+        // Inline function 'kotlin.js.asDynamic' call
+        this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] + yDisp;
+      }
+       while (inductionVariable < last);
+  };
+  protoOf(DeformationController).applyResize_cym5e6_k$ = function (scaleDelta, dt) {
+    var resizeRate = 4.0;
+    var amount = scaleDelta * resizeRate * dt;
+    var inductionVariable = 0;
+    var last = this.vertexCount_1;
+    if (inductionVariable < last)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        var ox = this.spring_1.getOriginalX_7i9a61_k$(i);
+        var oy = this.spring_1.getOriginalY_765dqy_k$(i);
+        var oz = this.spring_1.getOriginalZ_6u1hbv_k$(i);
+        // Inline function 'kotlin.math.sqrt' call
+        var x = ox * ox + oy * oy + oz * oz;
+        var origLen = Math.sqrt(x);
+        if (origLen > 0.001) {
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3)] + amount * ox / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 1 | 0] + amount * oy / origLen;
+          // Inline function 'org.khronos.webgl.set' call
+          // Inline function 'org.khronos.webgl.get' call
+          // Inline function 'kotlin.js.asDynamic' call
+          // Inline function 'kotlin.js.asDynamic' call
+          this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] = this.spring_1.get_targetOffsets_ba2ypy_k$()[imul(i, 3) + 2 | 0] + amount * oz / origLen;
+        }
+      }
+       while (inductionVariable < last);
+  };
+  protoOf(DeformationController).applyMultiFingerPoke_3z39f_k$ = function (points, radius, strength) {
+    var tmp0_iterator = points.iterator_jk1svi_k$();
+    while (tmp0_iterator.hasNext_bitz1p_k$()) {
+      var point = tmp0_iterator.next_20eer_k$();
+      this.applyPoke_o7qqd_k$(point, radius, strength);
+    }
+  };
+  protoOf(DeformationController).applyMultiFingerPoke$default_j2no4e_k$ = function (points, radius, strength, $super) {
+    radius = radius === VOID ? 0.6 : radius;
+    strength = strength === VOID ? -0.25 : strength;
+    var tmp;
+    if ($super === VOID) {
+      this.applyMultiFingerPoke_3z39f_k$(points, radius, strength);
+      tmp = Unit_getInstance();
+    } else {
+      tmp = $super.applyMultiFingerPoke_3z39f_k$.call(this, points, radius, strength);
+    }
+    return tmp;
+  };
   protoOf(DeformationController).reset_5u6xz3_k$ = function () {
     this.spring_1.reset_5u6xz3_k$();
-    this.spring_1.set_maxOffset_v40oe4_k$(1.2);
-    this.spring_1.set_maxVelocity_9qwoc2_k$(6.0);
+    this.spring_1.set_maxOffset_v40oe4_k$(2.0);
+    this.spring_1.set_maxVelocity_9qwoc2_k$(10.0);
   };
   function _get_geometry__ni2p9j($this) {
     return $this.geometry_1;
@@ -2243,10 +2851,10 @@
     this.targetOffsets_1 = new Float32Array(imul(this.vertexCount_1, 3));
     this.deformationMagnitudes_1 = new Float32Array(this.vertexCount_1);
     this.totalEnergy_1 = 0.0;
-    this.springConstant_1 = 8.0;
-    this.dampingCoeff_1 = 4.5;
-    this.maxOffset_1 = 1.2;
-    this.maxVelocity_1 = 6.0;
+    this.springConstant_1 = 3.0;
+    this.dampingCoeff_1 = 1.2;
+    this.maxOffset_1 = 2.0;
+    this.maxVelocity_1 = 10.0;
     var posArray = this.posAttr_1.array;
     var inductionVariable = 0;
     var last = imul(this.vertexCount_1, 3);
@@ -2405,6 +3013,83 @@
     // Inline function 'kotlin.js.asDynamic' call
     return this.originalPositions_1[imul(index, 3) + 2 | 0];
   };
+  function _get_amp__e6593h($this) {
+    return $this.amp_1;
+  }
+  function _get_vel__e6ihsk($this) {
+    return $this.vel_1;
+  }
+  function _get_freq__d6oh5f($this) {
+    return $this.freq_1;
+  }
+  function _get_damp__d5a73f($this) {
+    return $this.damp_1;
+  }
+  function WaveSystem() {
+    this.amp_1 = new Float64Array(5);
+    this.vel_1 = new Float64Array(5);
+    var tmp = this;
+    // Inline function 'kotlin.doubleArrayOf' call
+    tmp.freq_1 = new Float64Array([3.5, 3.5, 3.5, 5.5, 3.8]);
+    var tmp_0 = this;
+    // Inline function 'kotlin.doubleArrayOf' call
+    tmp_0.damp_1 = new Float64Array([0.7, 0.7, 0.7, 1.0, 0.8]);
+  }
+  protoOf(WaveSystem).excite_wki8fu_k$ = function (dirX, dirY, dirZ, strength) {
+    var tmp0_array = this.vel_1;
+    tmp0_array[0] = tmp0_array[0] + dirY * strength;
+    var tmp2_array = this.vel_1;
+    tmp2_array[1] = tmp2_array[1] + dirX * strength;
+    var tmp4_array = this.vel_1;
+    tmp4_array[2] = tmp4_array[2] + dirZ * strength;
+    var tmp6_array = this.vel_1;
+    tmp6_array[3] = tmp6_array[3] + strength * 0.3;
+    var yBias = dirY * dirY - 0.5 * (dirX * dirX + dirZ * dirZ);
+    var tmp8_array = this.vel_1;
+    tmp8_array[4] = tmp8_array[4] + yBias * strength * 0.5;
+  };
+  protoOf(WaveSystem).update_1d1qib_k$ = function (dt) {
+    var inductionVariable = 0;
+    if (inductionVariable < 5)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        var force = -this.freq_1[i] * this.freq_1[i] * this.amp_1[i] - this.damp_1[i] * this.vel_1[i];
+        var tmp1_array = this.vel_1;
+        tmp1_array[i] = tmp1_array[i] + force * dt;
+        var tmp3_array = this.amp_1;
+        tmp3_array[i] = tmp3_array[i] + this.vel_1[i] * dt;
+        this.amp_1[i] = coerceIn_0(this.amp_1[i], -1.5, 1.5);
+        this.vel_1[i] = coerceIn_0(this.vel_1[i], -8.0, 8.0);
+      }
+       while (inductionVariable < 5);
+  };
+  protoOf(WaveSystem).getRadialOffset_hh3rni_k$ = function (nx, ny, nz) {
+    return this.amp_1[0] * ny + this.amp_1[1] * nx + this.amp_1[2] * nz + this.amp_1[3] + this.amp_1[4] * (3.0 * ny * ny - 1.0) * 0.25;
+  };
+  protoOf(WaveSystem).get_totalEnergy_4zve65_k$ = function () {
+    var e = 0.0;
+    var inductionVariable = 0;
+    if (inductionVariable < 5)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        e = e + (this.vel_1[i] * this.vel_1[i] + this.freq_1[i] * this.freq_1[i] * this.amp_1[i] * this.amp_1[i]);
+      }
+       while (inductionVariable < 5);
+    return e;
+  };
+  protoOf(WaveSystem).reset_5u6xz3_k$ = function () {
+    var inductionVariable = 0;
+    if (inductionVariable < 5)
+      do {
+        var i = inductionVariable;
+        inductionVariable = inductionVariable + 1 | 0;
+        this.amp_1[i] = 0.0;
+        this.vel_1[i] = 0.0;
+      }
+       while (inductionVariable < 5);
+  };
   var HandGesture_NONE_instance;
   var HandGesture_OPEN_instance;
   var HandGesture_CLOSE_instance;
@@ -2415,8 +3100,13 @@
   var HandGesture_SPREAD_instance;
   var HandGesture_HORNS_instance;
   var HandGesture_PUNCH_instance;
+  var HandGesture_PINCH_instance;
+  var HandGesture_PULL_instance;
+  var HandGesture_SLAP_instance;
+  var HandGesture_KNEAD_instance;
+  var HandGesture_TWO_HAND_RESIZE_instance;
   function values() {
-    return [HandGesture_NONE_getInstance(), HandGesture_OPEN_getInstance(), HandGesture_CLOSE_getInstance(), HandGesture_POINTER_getInstance(), HandGesture_OK_getInstance(), HandGesture_VICTORY_getInstance(), HandGesture_THUMBS_UP_getInstance(), HandGesture_SPREAD_getInstance(), HandGesture_HORNS_getInstance(), HandGesture_PUNCH_getInstance()];
+    return [HandGesture_NONE_getInstance(), HandGesture_OPEN_getInstance(), HandGesture_CLOSE_getInstance(), HandGesture_POINTER_getInstance(), HandGesture_OK_getInstance(), HandGesture_VICTORY_getInstance(), HandGesture_THUMBS_UP_getInstance(), HandGesture_SPREAD_getInstance(), HandGesture_HORNS_getInstance(), HandGesture_PUNCH_getInstance(), HandGesture_PINCH_getInstance(), HandGesture_PULL_getInstance(), HandGesture_SLAP_getInstance(), HandGesture_KNEAD_getInstance(), HandGesture_TWO_HAND_RESIZE_getInstance()];
   }
   function valueOf(value) {
     switch (value) {
@@ -2440,6 +3130,16 @@
         return HandGesture_HORNS_getInstance();
       case 'PUNCH':
         return HandGesture_PUNCH_getInstance();
+      case 'PINCH':
+        return HandGesture_PINCH_getInstance();
+      case 'PULL':
+        return HandGesture_PULL_getInstance();
+      case 'SLAP':
+        return HandGesture_SLAP_getInstance();
+      case 'KNEAD':
+        return HandGesture_KNEAD_getInstance();
+      case 'TWO_HAND_RESIZE':
+        return HandGesture_TWO_HAND_RESIZE_getInstance();
       default:
         HandGesture_initEntries();
         THROW_IAE('No enum constant value.');
@@ -2466,6 +3166,11 @@
     HandGesture_SPREAD_instance = new HandGesture('SPREAD', 7, 'Explode!');
     HandGesture_HORNS_instance = new HandGesture('HORNS', 8, 'Scramble!');
     HandGesture_PUNCH_instance = new HandGesture('PUNCH', 9, 'Punch!');
+    HandGesture_PINCH_instance = new HandGesture('PINCH', 10, 'Pinch');
+    HandGesture_PULL_instance = new HandGesture('PULL', 11, 'Pull');
+    HandGesture_SLAP_instance = new HandGesture('SLAP', 12, 'Slap!');
+    HandGesture_KNEAD_instance = new HandGesture('KNEAD', 13, 'Knead');
+    HandGesture_TWO_HAND_RESIZE_instance = new HandGesture('TWO_HAND_RESIZE', 14, 'Resize');
   }
   var $ENTRIES;
   function HandGesture(name, ordinal, label) {
@@ -2475,6 +3180,215 @@
   protoOf(HandGesture).get_label_iuj8p7_k$ = function () {
     return this.label_1;
   };
+  function Finger3D(x, y, z, ndcX, ndcY) {
+    this.x_1 = x;
+    this.y_1 = y;
+    this.z_1 = z;
+    this.ndcX_1 = ndcX;
+    this.ndcY_1 = ndcY;
+  }
+  protoOf(Finger3D).get_x_1mhr67_k$ = function () {
+    return this.x_1;
+  };
+  protoOf(Finger3D).get_y_1mhr68_k$ = function () {
+    return this.y_1;
+  };
+  protoOf(Finger3D).get_z_1mhr69_k$ = function () {
+    return this.z_1;
+  };
+  protoOf(Finger3D).get_ndcX_wor0lw_k$ = function () {
+    return this.ndcX_1;
+  };
+  protoOf(Finger3D).get_ndcY_wor0lx_k$ = function () {
+    return this.ndcY_1;
+  };
+  protoOf(Finger3D).component1_7eebsc_k$ = function () {
+    return this.x_1;
+  };
+  protoOf(Finger3D).component2_7eebsb_k$ = function () {
+    return this.y_1;
+  };
+  protoOf(Finger3D).component3_7eebsa_k$ = function () {
+    return this.z_1;
+  };
+  protoOf(Finger3D).component4_7eebs9_k$ = function () {
+    return this.ndcX_1;
+  };
+  protoOf(Finger3D).component5_7eebs8_k$ = function () {
+    return this.ndcY_1;
+  };
+  protoOf(Finger3D).copy_5flxvz_k$ = function (x, y, z, ndcX, ndcY) {
+    return new Finger3D(x, y, z, ndcX, ndcY);
+  };
+  protoOf(Finger3D).copy$default_95xz78_k$ = function (x, y, z, ndcX, ndcY, $super) {
+    x = x === VOID ? this.x_1 : x;
+    y = y === VOID ? this.y_1 : y;
+    z = z === VOID ? this.z_1 : z;
+    ndcX = ndcX === VOID ? this.ndcX_1 : ndcX;
+    ndcY = ndcY === VOID ? this.ndcY_1 : ndcY;
+    return $super === VOID ? this.copy_5flxvz_k$(x, y, z, ndcX, ndcY) : $super.copy_5flxvz_k$.call(this, x, y, z, ndcX, ndcY);
+  };
+  protoOf(Finger3D).toString = function () {
+    return 'Finger3D(x=' + this.x_1 + ', y=' + this.y_1 + ', z=' + this.z_1 + ', ndcX=' + this.ndcX_1 + ', ndcY=' + this.ndcY_1 + ')';
+  };
+  protoOf(Finger3D).hashCode = function () {
+    var result = getNumberHashCode(this.x_1);
+    result = imul(result, 31) + getNumberHashCode(this.y_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.z_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.ndcX_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.ndcY_1) | 0;
+    return result;
+  };
+  protoOf(Finger3D).equals = function (other) {
+    if (this === other)
+      return true;
+    if (!(other instanceof Finger3D))
+      return false;
+    var tmp0_other_with_cast = other instanceof Finger3D ? other : THROW_CCE();
+    if (!equals(this.x_1, tmp0_other_with_cast.x_1))
+      return false;
+    if (!equals(this.y_1, tmp0_other_with_cast.y_1))
+      return false;
+    if (!equals(this.z_1, tmp0_other_with_cast.z_1))
+      return false;
+    if (!equals(this.ndcX_1, tmp0_other_with_cast.ndcX_1))
+      return false;
+    if (!equals(this.ndcY_1, tmp0_other_with_cast.ndcY_1))
+      return false;
+    return true;
+  };
+  function Hand3DState(wristX, wristY, wristZ, palmCenterX, palmCenterY, palmCenterZ, fingers, palmSpan, handScale, estimatedDepth) {
+    this.wristX_1 = wristX;
+    this.wristY_1 = wristY;
+    this.wristZ_1 = wristZ;
+    this.palmCenterX_1 = palmCenterX;
+    this.palmCenterY_1 = palmCenterY;
+    this.palmCenterZ_1 = palmCenterZ;
+    this.fingers_1 = fingers;
+    this.palmSpan_1 = palmSpan;
+    this.handScale_1 = handScale;
+    this.estimatedDepth_1 = estimatedDepth;
+  }
+  protoOf(Hand3DState).get_wristX_lin5v6_k$ = function () {
+    return this.wristX_1;
+  };
+  protoOf(Hand3DState).get_wristY_lin5v7_k$ = function () {
+    return this.wristY_1;
+  };
+  protoOf(Hand3DState).get_wristZ_lin5v8_k$ = function () {
+    return this.wristZ_1;
+  };
+  protoOf(Hand3DState).get_palmCenterX_fp531k_k$ = function () {
+    return this.palmCenterX_1;
+  };
+  protoOf(Hand3DState).get_palmCenterY_fp531l_k$ = function () {
+    return this.palmCenterY_1;
+  };
+  protoOf(Hand3DState).get_palmCenterZ_fp531m_k$ = function () {
+    return this.palmCenterZ_1;
+  };
+  protoOf(Hand3DState).get_fingers_cucon3_k$ = function () {
+    return this.fingers_1;
+  };
+  protoOf(Hand3DState).get_palmSpan_f3mly3_k$ = function () {
+    return this.palmSpan_1;
+  };
+  protoOf(Hand3DState).get_handScale_96x3zm_k$ = function () {
+    return this.handScale_1;
+  };
+  protoOf(Hand3DState).get_estimatedDepth_6t0t0w_k$ = function () {
+    return this.estimatedDepth_1;
+  };
+  protoOf(Hand3DState).component1_7eebsc_k$ = function () {
+    return this.wristX_1;
+  };
+  protoOf(Hand3DState).component2_7eebsb_k$ = function () {
+    return this.wristY_1;
+  };
+  protoOf(Hand3DState).component3_7eebsa_k$ = function () {
+    return this.wristZ_1;
+  };
+  protoOf(Hand3DState).component4_7eebs9_k$ = function () {
+    return this.palmCenterX_1;
+  };
+  protoOf(Hand3DState).component5_7eebs8_k$ = function () {
+    return this.palmCenterY_1;
+  };
+  protoOf(Hand3DState).component6_7eebs7_k$ = function () {
+    return this.palmCenterZ_1;
+  };
+  protoOf(Hand3DState).component7_7eebs6_k$ = function () {
+    return this.fingers_1;
+  };
+  protoOf(Hand3DState).component8_7eebs5_k$ = function () {
+    return this.palmSpan_1;
+  };
+  protoOf(Hand3DState).component9_7eebs4_k$ = function () {
+    return this.handScale_1;
+  };
+  protoOf(Hand3DState).component10_gazzfo_k$ = function () {
+    return this.estimatedDepth_1;
+  };
+  protoOf(Hand3DState).copy_bz4ki7_k$ = function (wristX, wristY, wristZ, palmCenterX, palmCenterY, palmCenterZ, fingers, palmSpan, handScale, estimatedDepth) {
+    return new Hand3DState(wristX, wristY, wristZ, palmCenterX, palmCenterY, palmCenterZ, fingers, palmSpan, handScale, estimatedDepth);
+  };
+  protoOf(Hand3DState).copy$default_2y5rx4_k$ = function (wristX, wristY, wristZ, palmCenterX, palmCenterY, palmCenterZ, fingers, palmSpan, handScale, estimatedDepth, $super) {
+    wristX = wristX === VOID ? this.wristX_1 : wristX;
+    wristY = wristY === VOID ? this.wristY_1 : wristY;
+    wristZ = wristZ === VOID ? this.wristZ_1 : wristZ;
+    palmCenterX = palmCenterX === VOID ? this.palmCenterX_1 : palmCenterX;
+    palmCenterY = palmCenterY === VOID ? this.palmCenterY_1 : palmCenterY;
+    palmCenterZ = palmCenterZ === VOID ? this.palmCenterZ_1 : palmCenterZ;
+    fingers = fingers === VOID ? this.fingers_1 : fingers;
+    palmSpan = palmSpan === VOID ? this.palmSpan_1 : palmSpan;
+    handScale = handScale === VOID ? this.handScale_1 : handScale;
+    estimatedDepth = estimatedDepth === VOID ? this.estimatedDepth_1 : estimatedDepth;
+    return $super === VOID ? this.copy_bz4ki7_k$(wristX, wristY, wristZ, palmCenterX, palmCenterY, palmCenterZ, fingers, palmSpan, handScale, estimatedDepth) : $super.copy_bz4ki7_k$.call(this, wristX, wristY, wristZ, palmCenterX, palmCenterY, palmCenterZ, fingers, palmSpan, handScale, estimatedDepth);
+  };
+  protoOf(Hand3DState).toString = function () {
+    return 'Hand3DState(wristX=' + this.wristX_1 + ', wristY=' + this.wristY_1 + ', wristZ=' + this.wristZ_1 + ', palmCenterX=' + this.palmCenterX_1 + ', palmCenterY=' + this.palmCenterY_1 + ', palmCenterZ=' + this.palmCenterZ_1 + ', fingers=' + this.fingers_1 + ', palmSpan=' + this.palmSpan_1 + ', handScale=' + this.handScale_1 + ', estimatedDepth=' + this.estimatedDepth_1 + ')';
+  };
+  protoOf(Hand3DState).hashCode = function () {
+    var result = getNumberHashCode(this.wristX_1);
+    result = imul(result, 31) + getNumberHashCode(this.wristY_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.wristZ_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.palmCenterX_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.palmCenterY_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.palmCenterZ_1) | 0;
+    result = imul(result, 31) + hashCode(this.fingers_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.palmSpan_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.handScale_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.estimatedDepth_1) | 0;
+    return result;
+  };
+  protoOf(Hand3DState).equals = function (other) {
+    if (this === other)
+      return true;
+    if (!(other instanceof Hand3DState))
+      return false;
+    var tmp0_other_with_cast = other instanceof Hand3DState ? other : THROW_CCE();
+    if (!equals(this.wristX_1, tmp0_other_with_cast.wristX_1))
+      return false;
+    if (!equals(this.wristY_1, tmp0_other_with_cast.wristY_1))
+      return false;
+    if (!equals(this.wristZ_1, tmp0_other_with_cast.wristZ_1))
+      return false;
+    if (!equals(this.palmCenterX_1, tmp0_other_with_cast.palmCenterX_1))
+      return false;
+    if (!equals(this.palmCenterY_1, tmp0_other_with_cast.palmCenterY_1))
+      return false;
+    if (!equals(this.palmCenterZ_1, tmp0_other_with_cast.palmCenterZ_1))
+      return false;
+    if (!equals(this.fingers_1, tmp0_other_with_cast.fingers_1))
+      return false;
+    if (!equals(this.palmSpan_1, tmp0_other_with_cast.palmSpan_1))
+      return false;
+    if (!equals(this.handScale_1, tmp0_other_with_cast.handScale_1))
+      return false;
+    if (!equals(this.estimatedDepth_1, tmp0_other_with_cast.estimatedDepth_1))
+      return false;
+    return true;
+  };
   function _set_enabled__gwlwmc($this, _set____db54di) {
     $this.enabled_1 = _set____db54di;
   }
@@ -2483,6 +3397,9 @@
   }
   function _set_handDetected__2eus9m($this, _set____db54di) {
     $this.handDetected_1 = _set____db54di;
+  }
+  function _set_hand2Detected__mohb34($this, _set____db54di) {
+    $this.hand2Detected_1 = _set____db54di;
   }
   function _set_handX__faf4ws($this, _set____db54di) {
     $this.handX_1 = _set____db54di;
@@ -2501,6 +3418,54 @@
   }
   function _set_handDeltaY__a3g02h($this, _set____db54di) {
     $this.handDeltaY_1 = _set____db54di;
+  }
+  function _set_hand3D__n8rwuh($this, _set____db54di) {
+    $this.hand3D_1 = _set____db54di;
+  }
+  function _set_hand2_3D__xjtbme($this, _set____db54di) {
+    $this.hand2_3D_1 = _set____db54di;
+  }
+  function _set_pinchAmount__5w4zgz($this, _set____db54di) {
+    $this.pinchAmount_1 = _set____db54di;
+  }
+  function _set_prevPinchAmount__m4mvvq($this, _set____db54di) {
+    $this.prevPinchAmount_1 = _set____db54di;
+  }
+  function _set_twoHandDistance__igsdqt($this, _set____db54di) {
+    $this.twoHandDistance_1 = _set____db54di;
+  }
+  function _set_prevTwoHandDistance__39z2xk($this, _set____db54di) {
+    $this.prevTwoHandDistance_1 = _set____db54di;
+  }
+  function _set_twoHandResizeDelta__hl7e1e($this, _set____db54di) {
+    $this.twoHandResizeDelta_1 = _set____db54di;
+  }
+  function _set_twoHandCenterX__becdgx($this, _set____db54di) {
+    $this.twoHandCenterX_1 = _set____db54di;
+  }
+  function _set_twoHandCenterY__becdg2($this, _set____db54di) {
+    $this.twoHandCenterY_1 = _set____db54di;
+  }
+  function _set_handVelocity__dvrfrp($this, _set____db54di) {
+    $this.handVelocity_1 = _set____db54di;
+  }
+  function _set_depthDelta__fdzxxe($this, _set____db54di) {
+    $this.depthDelta_1 = _set____db54di;
+  }
+  function _set_prevDepth__1w2ved($this, _set____db54di) {
+    $this.prevDepth_1 = _set____db54di;
+  }
+  function _get_prevDepth__v6xbsx($this) {
+    return $this.prevDepth_1;
+  }
+  function _set_kneadPhase__3ik7hd($this, _set____db54di) {
+    $this.kneadPhase_1 = _set____db54di;
+  }
+  function _get_kneadPhase__bjodnv($this) {
+    return $this.kneadPhase_1;
+  }
+  function _set_kneadIntensity__kdgnxl($this, _set____db54di) {
+    $this.kneadIntensity_1 = _set____db54di;
   }
   function _set_prevHandX__3q0kdr($this, _set____db54di) {
     $this.prevHandX_1 = _set____db54di;
@@ -2559,6 +3524,27 @@
   function _get_punchCooldown__siq9xk($this) {
     return $this.punchCooldown_1;
   }
+  function _set_slapCooldown__55kw0s($this, _set____db54di) {
+    $this.slapCooldown_1 = _set____db54di;
+  }
+  function _get_slapCooldown__ae5ujc($this) {
+    return $this.slapCooldown_1;
+  }
+  function _set_pullCooldown__15ulix($this, _set____db54di) {
+    $this.pullCooldown_1 = _set____db54di;
+  }
+  function _get_pullCooldown__edw517($this) {
+    return $this.pullCooldown_1;
+  }
+  function _get_velocityHistory__dlvit6($this) {
+    return $this.velocityHistory_1;
+  }
+  function _set_velocityIdx__ips8kl($this, _set____db54di) {
+    $this.velocityIdx_1 = _set____db54di;
+  }
+  function _get_velocityIdx__m0xn2n($this) {
+    return $this.velocityIdx_1;
+  }
   function start($this) {
     var tmp = typeof window.Hands !== 'undefined';
     var available = (!(tmp == null) ? typeof tmp === 'boolean' : false) ? tmp : THROW_CCE();
@@ -2574,10 +3560,111 @@
     window.stopGesture();
     $this.currentGesture_1 = HandGesture_NONE_getInstance();
     $this.handDetected_1 = false;
+    $this.hand2Detected_1 = false;
     $this.handDeltaX_1 = 0.0;
     $this.handDeltaY_1 = 0.0;
+    $this.hand3D_1 = null;
+    $this.hand2_3D_1 = null;
+    $this.pinchAmount_1 = 0.0;
+    $this.twoHandDistance_1 = 0.0;
+    $this.twoHandResizeDelta_1 = 0.0;
   }
-  function classifyGesture($this, lm) {
+  function build3DState($this, lm) {
+    var tmp = lm[0].x;
+    var wristX = (!(tmp == null) ? typeof tmp === 'number' : false) ? tmp : THROW_CCE();
+    var tmp_0 = lm[0].y;
+    var wristY = (!(tmp_0 == null) ? typeof tmp_0 === 'number' : false) ? tmp_0 : THROW_CCE();
+    var tmp_1 = lm[0].z;
+    var tmp0_elvis_lhs = (!(tmp_1 == null) ? typeof tmp_1 === 'number' : false) ? tmp_1 : null;
+    var wristZ = tmp0_elvis_lhs == null ? 0.0 : tmp0_elvis_lhs;
+    // Inline function 'kotlin.intArrayOf' call
+    var palmIndices = new Int32Array([0, 5, 9, 13, 17]);
+    var pcx = 0.0;
+    var pcy = 0.0;
+    var pcz = 0.0;
+    var inductionVariable = 0;
+    var last = palmIndices.length;
+    while (inductionVariable < last) {
+      var idx = palmIndices[inductionVariable];
+      inductionVariable = inductionVariable + 1 | 0;
+      var tmp_2 = pcx;
+      var tmp_3 = lm[idx].x;
+      pcx = tmp_2 + ((!(tmp_3 == null) ? typeof tmp_3 === 'number' : false) ? tmp_3 : THROW_CCE());
+      var tmp_4 = pcy;
+      var tmp_5 = lm[idx].y;
+      pcy = tmp_4 + ((!(tmp_5 == null) ? typeof tmp_5 === 'number' : false) ? tmp_5 : THROW_CCE());
+      var tmp_6 = pcz;
+      var tmp_7 = lm[idx].z;
+      var tmp2_elvis_lhs = (!(tmp_7 == null) ? typeof tmp_7 === 'number' : false) ? tmp_7 : null;
+      pcz = tmp_6 + (tmp2_elvis_lhs == null ? 0.0 : tmp2_elvis_lhs);
+    }
+    pcx = pcx / palmIndices.length;
+    pcy = pcy / palmIndices.length;
+    pcz = pcz / palmIndices.length;
+    // Inline function 'kotlin.intArrayOf' call
+    var tipIndices = new Int32Array([4, 8, 12, 16, 20]);
+    // Inline function 'kotlin.collections.map' call
+    // Inline function 'kotlin.collections.mapTo' call
+    var destination = ArrayList_init_$Create$_0(tipIndices.length);
+    var inductionVariable_0 = 0;
+    var last_0 = tipIndices.length;
+    while (inductionVariable_0 < last_0) {
+      var item = tipIndices[inductionVariable_0];
+      inductionVariable_0 = inductionVariable_0 + 1 | 0;
+      // Inline function 'gesture.GestureEngine.build3DState.<anonymous>' call
+      var tmp_8 = lm[item].x;
+      var fx = (!(tmp_8 == null) ? typeof tmp_8 === 'number' : false) ? tmp_8 : THROW_CCE();
+      var tmp_9 = lm[item].y;
+      var fy = (!(tmp_9 == null) ? typeof tmp_9 === 'number' : false) ? tmp_9 : THROW_CCE();
+      var tmp_10 = lm[item].z;
+      var tmp0_elvis_lhs_0 = (!(tmp_10 == null) ? typeof tmp_10 === 'number' : false) ? tmp_10 : null;
+      var fz = tmp0_elvis_lhs_0 == null ? 0.0 : tmp0_elvis_lhs_0;
+      var ndcX = 1.0 - 2.0 * fx;
+      var ndcY = 1.0 - 2.0 * fy;
+      var tmp$ret$2 = new Finger3D(fx, fy, fz, ndcX, ndcY);
+      destination.add_utx5q5_k$(tmp$ret$2);
+    }
+    var fingers = destination;
+    var tmp_11 = lm[9].x;
+    var midMcpX = (!(tmp_11 == null) ? typeof tmp_11 === 'number' : false) ? tmp_11 : THROW_CCE();
+    var tmp_12 = lm[9].y;
+    var midMcpY = (!(tmp_12 == null) ? typeof tmp_12 === 'number' : false) ? tmp_12 : THROW_CCE();
+    // Inline function 'kotlin.math.hypot' call
+    var x = wristX - midMcpX;
+    var y = wristY - midMcpY;
+    var palmSpan = hypot(x, y);
+    var minX = 1.0;
+    var maxX = 0.0;
+    var minY = 1.0;
+    var maxY = 0.0;
+    // Inline function 'kotlin.intArrayOf' call
+    var allIndices = new Int32Array([0, 4, 8, 12, 16, 20, 5, 9, 13, 17]);
+    var inductionVariable_1 = 0;
+    var last_1 = allIndices.length;
+    while (inductionVariable_1 < last_1) {
+      var idx_0 = allIndices[inductionVariable_1];
+      inductionVariable_1 = inductionVariable_1 + 1 | 0;
+      var tmp_13 = lm[idx_0].x;
+      var lx = (!(tmp_13 == null) ? typeof tmp_13 === 'number' : false) ? tmp_13 : THROW_CCE();
+      var tmp_14 = lm[idx_0].y;
+      var ly = (!(tmp_14 == null) ? typeof tmp_14 === 'number' : false) ? tmp_14 : THROW_CCE();
+      if (lx < minX)
+        minX = lx;
+      if (lx > maxX)
+        maxX = lx;
+      if (ly < minY)
+        minY = ly;
+      if (ly > maxY)
+        maxY = ly;
+    }
+    // Inline function 'kotlin.math.hypot' call
+    var x_0 = maxX - minX;
+    var y_0 = maxY - minY;
+    var handScale = hypot(x_0, y_0);
+    var estimatedDepth = palmSpan / 0.16;
+    return new Hand3DState(wristX, wristY, wristZ, pcx, pcy, pcz, fingers, palmSpan, handScale, estimatedDepth);
+  }
+  function classifyGesture($this, lm, lm2) {
     var thumbUp = isThumbExtended($this, lm);
     var indexUp = isFingerExtended($this, lm, 6, 8);
     var middleUp = isFingerExtended($this, lm, 10, 12);
@@ -2595,7 +3682,15 @@
     var x = thumbTipX - indexTipX;
     var y = thumbTipY - indexTipY;
     var okDist = hypot(x, y);
-    return (okDist < 0.06 ? (middleUp ? true : ringUp) ? true : pinkyUp : false) ? HandGesture_OK_getInstance() : ((((thumbUp ? indexUp : false) ? middleUp : false) ? ringUp : false) ? pinkyUp : false) ? HandGesture_SPREAD_getInstance() : (((indexUp ? !middleUp : false) ? !ringUp : false) ? pinkyUp : false) ? HandGesture_HORNS_getInstance() : (((indexUp ? middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_VICTORY_getInstance() : ((((thumbUp ? !indexUp : false) ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_THUMBS_UP_getInstance() : (((indexUp ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_POINTER_getInstance() : ((((!thumbUp ? indexUp : false) ? middleUp : false) ? ringUp : false) ? pinkyUp : false) ? HandGesture_OPEN_getInstance() : ((((!thumbUp ? !indexUp : false) ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_CLOSE_getInstance() : HandGesture_NONE_getInstance();
+    if (lm2 != null ? $this.hand2Detected_1 : false) {
+      var index2Up = isFingerExtended($this, lm2, 6, 8);
+      var middle2Up = isFingerExtended($this, lm2, 10, 12);
+      var ring2Up = isFingerExtended($this, lm2, 14, 16);
+      var bothOpen = ((indexUp ? middleUp : false) ? ringUp : false) ? (index2Up ? middle2Up : false) ? ring2Up : false : false;
+      if (bothOpen)
+        return HandGesture_TWO_HAND_RESIZE_getInstance();
+    }
+    return (((okDist < 0.06 ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_PINCH_getInstance() : (okDist < 0.06 ? $this.depthDelta_1 < -0.003 : false) ? HandGesture_PULL_getInstance() : (okDist < 0.06 ? (middleUp ? true : ringUp) ? true : pinkyUp : false) ? HandGesture_OK_getInstance() : ((((thumbUp ? indexUp : false) ? middleUp : false) ? ringUp : false) ? pinkyUp : false) ? HandGesture_SPREAD_getInstance() : (((indexUp ? !middleUp : false) ? !ringUp : false) ? pinkyUp : false) ? HandGesture_HORNS_getInstance() : (((indexUp ? middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_VICTORY_getInstance() : ((((thumbUp ? !indexUp : false) ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_THUMBS_UP_getInstance() : (((indexUp ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_POINTER_getInstance() : ((((!thumbUp ? !indexUp : false) ? !middleUp : false) ? ringUp : false) ? pinkyUp : false) ? HandGesture_KNEAD_getInstance() : ((((!thumbUp ? indexUp : false) ? middleUp : false) ? ringUp : false) ? pinkyUp : false) ? HandGesture_OPEN_getInstance() : ((((!thumbUp ? !indexUp : false) ? !middleUp : false) ? !ringUp : false) ? !pinkyUp : false) ? HandGesture_CLOSE_getInstance() : HandGesture_NONE_getInstance();
   }
   function isThumbExtended($this, lm) {
     var tmp = lm[4].x;
@@ -2622,12 +3717,27 @@
     this.enabled_1 = false;
     this.currentGesture_1 = HandGesture_NONE_getInstance();
     this.handDetected_1 = false;
+    this.hand2Detected_1 = false;
     this.handX_1 = 0.5;
     this.handY_1 = 0.5;
     this.fingerTipX_1 = 0.5;
     this.fingerTipY_1 = 0.5;
     this.handDeltaX_1 = 0.0;
     this.handDeltaY_1 = 0.0;
+    this.hand3D_1 = null;
+    this.hand2_3D_1 = null;
+    this.pinchAmount_1 = 0.0;
+    this.prevPinchAmount_1 = 0.0;
+    this.twoHandDistance_1 = 0.0;
+    this.prevTwoHandDistance_1 = 0.0;
+    this.twoHandResizeDelta_1 = 0.0;
+    this.twoHandCenterX_1 = 0.5;
+    this.twoHandCenterY_1 = 0.5;
+    this.handVelocity_1 = 0.0;
+    this.depthDelta_1 = 0.0;
+    this.prevDepth_1 = 0.0;
+    this.kneadPhase_1 = 0.0;
+    this.kneadIntensity_1 = 0.0;
     this.prevHandX_1 = 0.5;
     this.prevHandY_1 = 0.5;
     this.rawGesture_1 = HandGesture_NONE_getInstance();
@@ -2638,6 +3748,10 @@
     this.explodeCooldown_1 = 0.0;
     this.scrambleCooldown_1 = 0.0;
     this.punchCooldown_1 = 0.0;
+    this.slapCooldown_1 = 0.0;
+    this.pullCooldown_1 = 0.0;
+    this.velocityHistory_1 = new Float64Array(5);
+    this.velocityIdx_1 = 0;
   }
   protoOf(GestureEngine).get_enabled_pcr8o8_k$ = function () {
     return this.enabled_1;
@@ -2647,6 +3761,9 @@
   };
   protoOf(GestureEngine).get_handDetected_ht26cm_k$ = function () {
     return this.handDetected_1;
+  };
+  protoOf(GestureEngine).get_hand2Detected_tczc4c_k$ = function () {
+    return this.hand2Detected_1;
   };
   protoOf(GestureEngine).get_handX_iscb6o_k$ = function () {
     return this.handX_1;
@@ -2666,6 +3783,42 @@
   protoOf(GestureEngine).get_handDeltaY_68bc7b_k$ = function () {
     return this.handDeltaY_1;
   };
+  protoOf(GestureEngine).get_hand3D_e5p63t_k$ = function () {
+    return this.hand3D_1;
+  };
+  protoOf(GestureEngine).get_hand2_3D_vsqld6_k$ = function () {
+    return this.hand2_3D_1;
+  };
+  protoOf(GestureEngine).get_pinchAmount_pmvww9_k$ = function () {
+    return this.pinchAmount_1;
+  };
+  protoOf(GestureEngine).get_prevPinchAmount_om9boq_k$ = function () {
+    return this.prevPinchAmount_1;
+  };
+  protoOf(GestureEngine).get_twoHandDistance_gi9gqv_k$ = function () {
+    return this.twoHandDistance_1;
+  };
+  protoOf(GestureEngine).get_prevTwoHandDistance_oc01qs_k$ = function () {
+    return this.prevTwoHandDistance_1;
+  };
+  protoOf(GestureEngine).get_twoHandResizeDelta_jd4hle_k$ = function () {
+    return this.twoHandResizeDelta_1;
+  };
+  protoOf(GestureEngine).get_twoHandCenterX_kjn975_k$ = function () {
+    return this.twoHandCenterX_1;
+  };
+  protoOf(GestureEngine).get_twoHandCenterY_kjn976_k$ = function () {
+    return this.twoHandCenterY_1;
+  };
+  protoOf(GestureEngine).get_handVelocity_5ipx1_k$ = function () {
+    return this.handVelocity_1;
+  };
+  protoOf(GestureEngine).get_depthDelta_gv5o76_k$ = function () {
+    return this.depthDelta_1;
+  };
+  protoOf(GestureEngine).get_kneadIntensity_csrpe1_k$ = function () {
+    return this.kneadIntensity_1;
+  };
   protoOf(GestureEngine).toggle_ecyros_k$ = function () {
     if (this.enabled_1) {
       stop(this);
@@ -2682,13 +3835,19 @@
     this.explodeCooldown_1 = coerceAtLeast(this.explodeCooldown_1 - dt, 0.0);
     this.scrambleCooldown_1 = coerceAtLeast(this.scrambleCooldown_1 - dt, 0.0);
     this.punchCooldown_1 = coerceAtLeast(this.punchCooldown_1 - dt, 0.0);
+    this.slapCooldown_1 = coerceAtLeast(this.slapCooldown_1 - dt, 0.0);
+    this.pullCooldown_1 = coerceAtLeast(this.pullCooldown_1 - dt, 0.0);
     var tmp = window._handDetected === true;
     var detected = (!(tmp == null) ? typeof tmp === 'boolean' : false) ? tmp : THROW_CCE();
     if (!detected) {
       this.handDetected_1 = false;
+      this.hand2Detected_1 = false;
       this.currentGesture_1 = HandGesture_NONE_getInstance();
       this.handDeltaX_1 = 0.0;
       this.handDeltaY_1 = 0.0;
+      this.hand3D_1 = null;
+      this.hand2_3D_1 = null;
+      this.depthDelta_1 = 0.0;
       var label = document.getElementById('gestureLabel');
       if (label != null) {
         label.textContent = 'No hand';
@@ -2699,23 +3858,85 @@
     var lm = window._handLandmarks;
     if (lm == null)
       return Unit_getInstance();
+    var tmp_0 = window._hand2Detected === true;
+    var h2detected = (!(tmp_0 == null) ? typeof tmp_0 === 'boolean' : false) ? tmp_0 : THROW_CCE();
+    this.hand2Detected_1 = h2detected;
+    var lm2 = h2detected ? window._hand2Landmarks : null;
     this.prevHandX_1 = this.handX_1;
     this.prevHandY_1 = this.handY_1;
-    var tmp_0 = this;
-    var tmp_1 = lm[0].x;
-    tmp_0.handX_1 = (!(tmp_1 == null) ? typeof tmp_1 === 'number' : false) ? tmp_1 : THROW_CCE();
-    var tmp_2 = this;
-    var tmp_3 = lm[0].y;
-    tmp_2.handY_1 = (!(tmp_3 == null) ? typeof tmp_3 === 'number' : false) ? tmp_3 : THROW_CCE();
+    var tmp_1 = this;
+    var tmp_2 = lm[0].x;
+    tmp_1.handX_1 = (!(tmp_2 == null) ? typeof tmp_2 === 'number' : false) ? tmp_2 : THROW_CCE();
+    var tmp_3 = this;
+    var tmp_4 = lm[0].y;
+    tmp_3.handY_1 = (!(tmp_4 == null) ? typeof tmp_4 === 'number' : false) ? tmp_4 : THROW_CCE();
     this.handDeltaX_1 = this.handX_1 - this.prevHandX_1;
     this.handDeltaY_1 = this.handY_1 - this.prevHandY_1;
-    var tmp_4 = this;
-    var tmp_5 = lm[8].x;
-    tmp_4.fingerTipX_1 = (!(tmp_5 == null) ? typeof tmp_5 === 'number' : false) ? tmp_5 : THROW_CCE();
-    var tmp_6 = this;
-    var tmp_7 = lm[8].y;
-    tmp_6.fingerTipY_1 = (!(tmp_7 == null) ? typeof tmp_7 === 'number' : false) ? tmp_7 : THROW_CCE();
-    var detectedGesture = classifyGesture(this, lm);
+    var tmp_5 = this;
+    var tmp_6 = lm[8].x;
+    tmp_5.fingerTipX_1 = (!(tmp_6 == null) ? typeof tmp_6 === 'number' : false) ? tmp_6 : THROW_CCE();
+    var tmp_7 = this;
+    var tmp_8 = lm[8].y;
+    tmp_7.fingerTipY_1 = (!(tmp_8 == null) ? typeof tmp_8 === 'number' : false) ? tmp_8 : THROW_CCE();
+    this.hand3D_1 = build3DState(this, lm);
+    this.hand2_3D_1 = lm2 != null ? build3DState(this, lm2) : null;
+    var tmp0_safe_receiver = this.hand3D_1;
+    var tmp1_elvis_lhs = tmp0_safe_receiver == null ? null : tmp0_safe_receiver.estimatedDepth_1;
+    var currentDepth = tmp1_elvis_lhs == null ? 0.0 : tmp1_elvis_lhs;
+    this.depthDelta_1 = currentDepth - this.prevDepth_1;
+    this.prevDepth_1 = currentDepth;
+    // Inline function 'kotlin.math.hypot' call
+    var x = this.handDeltaX_1;
+    var y = this.handDeltaY_1;
+    var rawVel = hypot(x, y);
+    this.velocityHistory_1[this.velocityIdx_1 % 5 | 0] = rawVel;
+    this.velocityIdx_1 = this.velocityIdx_1 + 1 | 0;
+    this.handVelocity_1 = average(this.velocityHistory_1);
+    var tmp_9 = lm[4].x;
+    var thumbTipX = (!(tmp_9 == null) ? typeof tmp_9 === 'number' : false) ? tmp_9 : THROW_CCE();
+    var tmp_10 = lm[4].y;
+    var thumbTipY = (!(tmp_10 == null) ? typeof tmp_10 === 'number' : false) ? tmp_10 : THROW_CCE();
+    var tmp_11 = lm[4].z;
+    var tmp4_elvis_lhs = (!(tmp_11 == null) ? typeof tmp_11 === 'number' : false) ? tmp_11 : null;
+    var thumbTipZ = tmp4_elvis_lhs == null ? 0.0 : tmp4_elvis_lhs;
+    var tmp_12 = lm[8].x;
+    var indexTipX = (!(tmp_12 == null) ? typeof tmp_12 === 'number' : false) ? tmp_12 : THROW_CCE();
+    var tmp_13 = lm[8].y;
+    var indexTipY = (!(tmp_13 == null) ? typeof tmp_13 === 'number' : false) ? tmp_13 : THROW_CCE();
+    var tmp_14 = lm[8].z;
+    var tmp5_elvis_lhs = (!(tmp_14 == null) ? typeof tmp_14 === 'number' : false) ? tmp_14 : null;
+    var indexTipZ = tmp5_elvis_lhs == null ? 0.0 : tmp5_elvis_lhs;
+    // Inline function 'kotlin.math.sqrt' call
+    var x_0 = (thumbTipX - indexTipX) * (thumbTipX - indexTipX) + (thumbTipY - indexTipY) * (thumbTipY - indexTipY) + (thumbTipZ - indexTipZ) * (thumbTipZ - indexTipZ);
+    var pinchDist = Math.sqrt(x_0);
+    this.prevPinchAmount_1 = this.pinchAmount_1;
+    this.pinchAmount_1 = 1.0 - coerceIn_0((pinchDist - 0.03) / 0.12, 0.0, 1.0);
+    if (this.hand2Detected_1 ? !(this.hand2_3D_1 == null) : false) {
+      this.prevTwoHandDistance_1 = this.twoHandDistance_1;
+      var h1 = ensureNotNull(this.hand3D_1);
+      var h2 = ensureNotNull(this.hand2_3D_1);
+      var tmp_15 = this;
+      // Inline function 'kotlin.math.hypot' call
+      var x_1 = h1.palmCenterX_1 - h2.palmCenterX_1;
+      var y_0 = h1.palmCenterY_1 - h2.palmCenterY_1;
+      tmp_15.twoHandDistance_1 = hypot(x_1, y_0);
+      this.twoHandResizeDelta_1 = this.twoHandDistance_1 - this.prevTwoHandDistance_1;
+      this.twoHandCenterX_1 = (h1.palmCenterX_1 + h2.palmCenterX_1) / 2.0;
+      this.twoHandCenterY_1 = (h1.palmCenterY_1 + h2.palmCenterY_1) / 2.0;
+    } else {
+      this.twoHandResizeDelta_1 = 0.0;
+    }
+    if (this.currentGesture_1.equals(HandGesture_KNEAD_getInstance())) {
+      this.kneadPhase_1 = this.kneadPhase_1 + dt * 3.0;
+      var tmp_16 = this;
+      // Inline function 'kotlin.math.sin' call
+      var x_2 = this.kneadPhase_1;
+      tmp_16.kneadIntensity_1 = (Math.sin(x_2) + 1.0) / 2.0;
+    } else {
+      this.kneadPhase_1 = 0.0;
+      this.kneadIntensity_1 = 0.0;
+    }
+    var detectedGesture = classifyGesture(this, lm, lm2);
     if (detectedGesture.equals(this.rawGesture_1)) {
       this.gestureFrames_1 = this.gestureFrames_1 + 1 | 0;
     } else {
@@ -2726,12 +3947,13 @@
       this.currentGesture_1 = this.rawGesture_1;
     }
     if (this.currentGesture_1.equals(HandGesture_CLOSE_getInstance())) {
-      // Inline function 'kotlin.math.hypot' call
-      var x = this.handDeltaX_1;
-      var y = this.handDeltaY_1;
-      var velocity = hypot(x, y);
-      if (velocity > 0.025) {
+      if (this.handVelocity_1 > 0.025) {
         this.currentGesture_1 = HandGesture_PUNCH_getInstance();
+      }
+    }
+    if (this.currentGesture_1.equals(HandGesture_OPEN_getInstance())) {
+      if (this.handVelocity_1 > 0.04) {
+        this.currentGesture_1 = HandGesture_SLAP_getInstance();
       }
     }
     var label_0 = document.getElementById('gestureLabel');
@@ -2774,10 +3996,46 @@
     }
     return false;
   };
+  protoOf(GestureEngine).shouldSlap_4trucl_k$ = function () {
+    if (this.currentGesture_1.equals(HandGesture_SLAP_getInstance()) ? this.slapCooldown_1 <= 0.0 : false) {
+      this.slapCooldown_1 = 0.5;
+      return true;
+    }
+    return false;
+  };
+  protoOf(GestureEngine).shouldPull_4ttkdk_k$ = function () {
+    if (this.currentGesture_1.equals(HandGesture_PULL_getInstance()) ? this.pullCooldown_1 <= 0.0 : false) {
+      this.pullCooldown_1 = 0.3;
+      return true;
+    }
+    return false;
+  };
   protoOf(GestureEngine).getFingerNDC_8gqdfy_k$ = function () {
     var ndcX = 1.0 - 2.0 * this.fingerTipX_1;
     var ndcY = 1.0 - 2.0 * this.fingerTipY_1;
     return new Pair(ndcX, ndcY);
+  };
+  protoOf(GestureEngine).getAllFingerNDC_hesi5j_k$ = function () {
+    var tmp0_safe_receiver = this.hand3D_1;
+    var tmp1_safe_receiver = tmp0_safe_receiver == null ? null : tmp0_safe_receiver.fingers_1;
+    var tmp;
+    if (tmp1_safe_receiver == null) {
+      tmp = null;
+    } else {
+      // Inline function 'kotlin.collections.map' call
+      // Inline function 'kotlin.collections.mapTo' call
+      var destination = ArrayList_init_$Create$_0(collectionSizeOrDefault(tmp1_safe_receiver, 10));
+      var tmp0_iterator = tmp1_safe_receiver.iterator_jk1svi_k$();
+      while (tmp0_iterator.hasNext_bitz1p_k$()) {
+        var item = tmp0_iterator.next_20eer_k$();
+        // Inline function 'gesture.GestureEngine.getAllFingerNDC.<anonymous>' call
+        var tmp$ret$0 = new Pair(item.ndcX_1, item.ndcY_1);
+        destination.add_utx5q5_k$(tmp$ret$0);
+      }
+      tmp = destination;
+    }
+    var tmp2_elvis_lhs = tmp;
+    return tmp2_elvis_lhs == null ? emptyList() : tmp2_elvis_lhs;
   };
   protoOf(GestureEngine).getRotationDelta_ep2l7g_k$ = function () {
     if (!this.handDetected_1)
@@ -2823,6 +4081,26 @@
   function HandGesture_PUNCH_getInstance() {
     HandGesture_initEntries();
     return HandGesture_PUNCH_instance;
+  }
+  function HandGesture_PINCH_getInstance() {
+    HandGesture_initEntries();
+    return HandGesture_PINCH_instance;
+  }
+  function HandGesture_PULL_getInstance() {
+    HandGesture_initEntries();
+    return HandGesture_PULL_instance;
+  }
+  function HandGesture_SLAP_getInstance() {
+    HandGesture_initEntries();
+    return HandGesture_SLAP_instance;
+  }
+  function HandGesture_KNEAD_getInstance() {
+    HandGesture_initEntries();
+    return HandGesture_KNEAD_instance;
+  }
+  function HandGesture_TWO_HAND_RESIZE_getInstance() {
+    HandGesture_initEntries();
+    return HandGesture_TWO_HAND_RESIZE_instance;
   }
   function _get_onReset__bnqbvj($this) {
     return $this.onReset_1;
@@ -2952,6 +4230,37 @@
     this_0.innerHTML = html;
     return this_0;
   }
+  function _set_cameraPreviewOn__hcddpf($this, _set____db54di) {
+    $this.cameraPreviewOn_1 = _set____db54di;
+  }
+  function _get_cameraPreviewOn__rg3l7z($this) {
+    return $this.cameraPreviewOn_1;
+  }
+  function toggleCameraPreview($this) {
+    $this.cameraPreviewOn_1 = !$this.cameraPreviewOn_1;
+    var tmp = document.getElementById('btnCamPreview');
+    var tmp0_safe_receiver = tmp instanceof HTMLElement ? tmp : null;
+    if (tmp0_safe_receiver != null) {
+      tmp0_safe_receiver.textContent = $this.cameraPreviewOn_1 ? 'Camera On' : 'Camera Off';
+    }
+    if ($this.cameraPreviewOn_1) {
+      window._cameraPreviewOn = true;
+      if (!document.getElementById('cameraPreview')) {
+        var c = document.createElement('canvas');
+        c.id = 'cameraPreview';
+        c.className = 'camera-preview';
+        c.width = 320;
+        c.height = 240;
+        document.body.appendChild(c);
+      }
+      document.getElementById('cameraPreview').style.display = '';
+    } else {
+      window._cameraPreviewOn = false;
+      var cp = document.getElementById('cameraPreview');
+      if (cp)
+        cp.style.display = 'none';
+    }
+  }
   function nextMotivationQuote($this) {
     $this.motivationIndex_1 = ($this.motivationIndex_1 + 1 | 0) % $this.quotes_1.length | 0;
     var tmp0_safe_receiver = $this.motivationQuoteEl_1;
@@ -3064,11 +4373,17 @@
   }
   function HtmlOverlay$setup$lambda_6(this$0) {
     return function (it) {
-      toggleBreathing(this$0);
+      toggleCameraPreview(this$0);
       return Unit_getInstance();
     };
   }
   function HtmlOverlay$setup$lambda_7(this$0) {
+    return function (it) {
+      toggleBreathing(this$0);
+      return Unit_getInstance();
+    };
+  }
+  function HtmlOverlay$setup$lambda_8(this$0) {
     return function (it) {
       nextMotivationQuote(this$0);
       return Unit_getInstance();
@@ -3082,7 +4397,7 @@
       return Unit_getInstance();
     };
   }
-  function HtmlOverlay$setup$lambda_8(this$0) {
+  function HtmlOverlay$setup$lambda_9(this$0) {
     return function (btn) {
       var tmp = btn instanceof HTMLElement ? btn : THROW_CCE();
       tmp.addEventListener('click', HtmlOverlay$setup$lambda$lambda(btn, this$0));
@@ -3159,6 +4474,7 @@
     // Inline function 'kotlin.js.asDynamic' call
     tmp_2.quotes_1 = ["Take a breath. You're doing well.", 'Small progress is still progress.', "You don't have to rush.", "You've solved harder problems before.", 'Be kind to yourself today.', 'This moment is yours.', "Let go of what you can't control.", 'One step at a time.', "You're exactly where you need to be.", 'Rest is productive too.', 'Breathe in calm, breathe out tension.', 'Your best is enough.', "It's okay to take a break.", 'You are more capable than you think.', "Slow down. There's no hurry.", 'Trust the process.', "You're making it happen.", 'Consistency beats intensity.', 'Give yourself permission to pause.', 'Every expert was once a beginner.'];
     this.quoteVisible_1 = false;
+    this.cameraPreviewOn_1 = false;
   }
   protoOf(HtmlOverlay).setup_2u6ser_k$ = function () {
     var tmp = this;
@@ -3175,7 +4491,7 @@
       null;
     else
       tmp0_safe_receiver.appendChild(ensureNotNull(this.quoteEl_1));
-    this.sectionDeform_1 = createSection(this, 'section-deform', '<div class="section-hint">\n    drag to rotate \xB7 scroll to zoom \xB7 press keys to deform\n<\/div>\n<div class="deform-controls">\n    <button class="pill-btn" id="btnReset">Reset<\/button>\n    <button class="pill-btn" id="btnSound">Sound Off<\/button>\n    <button class="pill-btn" id="btnTheme">Theme<\/button>\n    <button class="pill-btn" id="btnColor">Color<\/button>\n    <button class="pill-btn" id="btnStyle">Style: Calm Jelly<\/button>\n    <button class="pill-btn" id="btnScale">Size: Normal<\/button>\n    <button class="pill-btn" id="btnGesture">Gesture: Off<\/button>\n<\/div>');
+    this.sectionDeform_1 = createSection(this, 'section-deform', '<div class="section-hint">\n    drag to rotate \xB7 scroll to zoom \xB7 keys to deform\n<\/div>\n<div class="deform-controls">\n    <button class="pill-btn" id="btnReset">Reset<\/button>\n    <button class="pill-btn" id="btnSound">Sound Off<\/button>\n    <button class="pill-btn" id="btnTheme">Theme<\/button>\n    <button class="pill-btn" id="btnColor">Color<\/button>\n    <button class="pill-btn" id="btnStyle">Calm Jelly<\/button>\n    <button class="pill-btn" id="btnScale">Normal<\/button>\n    <button class="pill-btn" id="btnGesture">Gesture Off<\/button>\n    <button class="pill-btn" id="btnCamPreview">Camera Off<\/button>\n<\/div>');
     var tmp1_safe_receiver = document.body;
     if (tmp1_safe_receiver == null)
       null;
@@ -3226,17 +4542,23 @@
     else {
       tmp8_safe_receiver.addEventListener('click', HtmlOverlay$setup$lambda_5(this));
     }
-    this.sectionFocus_1 = createSection(this, 'section-focus', '<div class="focus-content">\n    <div class="breathing-ring" id="breathRing">\n        <div class="breathing-circle" id="breathCircle"><\/div>\n    <\/div>\n    <div class="breathing-label" id="breathLabel">Ready<\/div>\n    <button class="pill-btn breath-btn" id="btnBreath">Start Breathing<\/button>\n    <div class="focus-desc">4 seconds inhale \xB7 4 seconds hold \xB7 4 seconds exhale<\/div>\n<\/div>');
-    var tmp9_safe_receiver = this.sectionFocus_1;
-    var tmp10_safe_receiver = tmp9_safe_receiver == null ? null : tmp9_safe_receiver.style;
-    if (tmp10_safe_receiver != null) {
-      tmp10_safe_receiver.display = 'none';
+    var tmp9_safe_receiver = document.getElementById('btnCamPreview');
+    if (tmp9_safe_receiver == null)
+      null;
+    else {
+      tmp9_safe_receiver.addEventListener('click', HtmlOverlay$setup$lambda_6(this));
     }
-    var tmp11_safe_receiver = document.body;
-    if (tmp11_safe_receiver == null)
+    this.sectionFocus_1 = createSection(this, 'section-focus', '<div class="focus-content">\n    <div class="breathing-ring" id="breathRing">\n        <div class="breathing-circle" id="breathCircle"><\/div>\n    <\/div>\n    <div class="breathing-label" id="breathLabel">Ready<\/div>\n    <button class="pill-btn breath-btn" id="btnBreath">Start Breathing<\/button>\n    <div class="focus-desc">4 seconds inhale \xB7 4 seconds hold \xB7 4 seconds exhale<\/div>\n<\/div>');
+    var tmp10_safe_receiver = this.sectionFocus_1;
+    var tmp11_safe_receiver = tmp10_safe_receiver == null ? null : tmp10_safe_receiver.style;
+    if (tmp11_safe_receiver != null) {
+      tmp11_safe_receiver.display = 'none';
+    }
+    var tmp12_safe_receiver = document.body;
+    if (tmp12_safe_receiver == null)
       null;
     else
-      tmp11_safe_receiver.appendChild(ensureNotNull(this.sectionFocus_1));
+      tmp12_safe_receiver.appendChild(ensureNotNull(this.sectionFocus_1));
     var tmp_3 = this;
     var tmp_4 = document.getElementById('breathCircle');
     tmp_3.breathingCircle_1 = tmp_4 instanceof HTMLElement ? tmp_4 : null;
@@ -3246,58 +4568,58 @@
     var tmp_7 = this;
     var tmp_8 = document.getElementById('btnBreath');
     tmp_7.breathingBtn_1 = tmp_8 instanceof HTMLElement ? tmp_8 : null;
-    var tmp12_safe_receiver = this.breathingBtn_1;
-    if (tmp12_safe_receiver == null)
+    var tmp13_safe_receiver = this.breathingBtn_1;
+    if (tmp13_safe_receiver == null)
       null;
     else {
-      tmp12_safe_receiver.addEventListener('click', HtmlOverlay$setup$lambda_6(this));
+      tmp13_safe_receiver.addEventListener('click', HtmlOverlay$setup$lambda_7(this));
     }
     this.sectionMotivation_1 = createSection(this, 'section-motivation', '<div class="motivation-content">\n    <div class="motivation-quote" id="motivQuote">"Small progress is still progress."<\/div>\n    <div class="motivation-actions">\n        <button class="pill-btn" id="btnNextQuote">Next Quote<\/button>\n    <\/div>\n<\/div>');
-    var tmp13_safe_receiver = this.sectionMotivation_1;
-    var tmp14_safe_receiver = tmp13_safe_receiver == null ? null : tmp13_safe_receiver.style;
-    if (tmp14_safe_receiver != null) {
-      tmp14_safe_receiver.display = 'none';
+    var tmp14_safe_receiver = this.sectionMotivation_1;
+    var tmp15_safe_receiver = tmp14_safe_receiver == null ? null : tmp14_safe_receiver.style;
+    if (tmp15_safe_receiver != null) {
+      tmp15_safe_receiver.display = 'none';
     }
-    var tmp15_safe_receiver = document.body;
-    if (tmp15_safe_receiver == null)
+    var tmp16_safe_receiver = document.body;
+    if (tmp16_safe_receiver == null)
       null;
     else
-      tmp15_safe_receiver.appendChild(ensureNotNull(this.sectionMotivation_1));
+      tmp16_safe_receiver.appendChild(ensureNotNull(this.sectionMotivation_1));
     var tmp_9 = this;
     var tmp_10 = document.getElementById('motivQuote');
     tmp_9.motivationQuoteEl_1 = tmp_10 instanceof HTMLElement ? tmp_10 : null;
-    var tmp16_safe_receiver = document.getElementById('btnNextQuote');
-    if (tmp16_safe_receiver == null)
+    var tmp17_safe_receiver = document.getElementById('btnNextQuote');
+    if (tmp17_safe_receiver == null)
       null;
     else {
-      tmp16_safe_receiver.addEventListener('click', HtmlOverlay$setup$lambda_7(this));
+      tmp17_safe_receiver.addEventListener('click', HtmlOverlay$setup$lambda_8(this));
     }
     this.sectionCalm_1 = createSection(this, 'section-calm', '<div class="calm-content">\n    <div class="calm-text">Let your mind drift.<\/div>\n    <div class="calm-subtext">The blob floats gently. Just watch.<\/div>\n<\/div>');
-    var tmp17_safe_receiver = this.sectionCalm_1;
-    var tmp18_safe_receiver = tmp17_safe_receiver == null ? null : tmp17_safe_receiver.style;
-    if (tmp18_safe_receiver != null) {
-      tmp18_safe_receiver.display = 'none';
+    var tmp18_safe_receiver = this.sectionCalm_1;
+    var tmp19_safe_receiver = tmp18_safe_receiver == null ? null : tmp18_safe_receiver.style;
+    if (tmp19_safe_receiver != null) {
+      tmp19_safe_receiver.display = 'none';
     }
-    var tmp19_safe_receiver = document.body;
-    if (tmp19_safe_receiver == null)
+    var tmp20_safe_receiver = document.body;
+    if (tmp20_safe_receiver == null)
       null;
     else
-      tmp19_safe_receiver.appendChild(ensureNotNull(this.sectionCalm_1));
+      tmp20_safe_receiver.appendChild(ensureNotNull(this.sectionCalm_1));
     // Inline function 'kotlin.apply' call
     var tmp_11 = document.createElement('nav');
     var this_1 = tmp_11 instanceof HTMLElement ? tmp_11 : THROW_CCE();
     // Inline function 'kotlin.contracts.contract' call
     // Inline function 'ui.HtmlOverlay.setup.<anonymous>' call
     this_1.id = 'nav';
-    this_1.innerHTML = '<button class="nav-btn active" data-section="deform">\n    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8c-2 0-3.5 1.5-3.5 4s1.5 4 3.5 4 3.5-1.5 3.5-4-1.5-4-3.5-4z"/><\/svg>\n    <span>Deform<\/span>\n<\/button>\n<button class="nav-btn" data-section="focus">\n    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><\/svg>\n    <span>Focus<\/span>\n<\/button>\n<button class="nav-btn" data-section="motivation">\n    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/><\/svg>\n    <span>Motivation<\/span>\n<\/button>\n<button class="nav-btn" data-section="calm">\n    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/><\/svg>\n    <span>Calm<\/span>\n<\/button>';
+    this_1.innerHTML = '<button class="nav-btn active" data-section="deform">\n    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8c-2 0-3.5 1.5-3.5 4s1.5 4 3.5 4 3.5-1.5 3.5-4-1.5-4-3.5-4z"/><\/svg>\n    <span>Deform<\/span>\n<\/button>\n<button class="nav-btn" data-section="focus">\n    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/><\/svg>\n    <span>Focus<\/span>\n<\/button>\n<button class="nav-btn" data-section="motivation">\n    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/><\/svg>\n    <span>Motivation<\/span>\n<\/button>\n<button class="nav-btn" data-section="calm">\n    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/><\/svg>\n    <span>Calm<\/span>\n<\/button>';
     var nav = this_1;
-    var tmp20_safe_receiver = document.body;
-    if (tmp20_safe_receiver == null)
+    var tmp21_safe_receiver = document.body;
+    if (tmp21_safe_receiver == null)
       null;
     else
-      tmp20_safe_receiver.appendChild(nav);
+      tmp21_safe_receiver.appendChild(nav);
     // Inline function 'kotlin.js.asDynamic' call
-    nav.querySelectorAll('.nav-btn').forEach(HtmlOverlay$setup$lambda_8(this));
+    nav.querySelectorAll('.nav-btn').forEach(HtmlOverlay$setup$lambda_9(this));
     this.showQuote_1u79zl_k$();
   };
   protoOf(HtmlOverlay).switchSection_whxpfr_k$ = function (name) {
@@ -3385,21 +4707,33 @@
     var tmp = document.getElementById('btnScale');
     var tmp0_safe_receiver = tmp instanceof HTMLElement ? tmp : null;
     if (tmp0_safe_receiver != null) {
-      tmp0_safe_receiver.textContent = 'Size: ' + label;
+      tmp0_safe_receiver.textContent = label;
     }
   };
   protoOf(HtmlOverlay).updateStyleLabel_9i5s5a_k$ = function (label) {
     var tmp = document.getElementById('btnStyle');
     var tmp0_safe_receiver = tmp instanceof HTMLElement ? tmp : null;
     if (tmp0_safe_receiver != null) {
-      tmp0_safe_receiver.textContent = 'Style: ' + label;
+      tmp0_safe_receiver.textContent = label;
     }
   };
   protoOf(HtmlOverlay).updateGestureLabel_41kerl_k$ = function (on) {
     var tmp = document.getElementById('btnGesture');
     var tmp0_safe_receiver = tmp instanceof HTMLElement ? tmp : null;
     if (tmp0_safe_receiver != null) {
-      tmp0_safe_receiver.textContent = on ? 'Gesture: On' : 'Gesture: Off';
+      tmp0_safe_receiver.textContent = on ? 'Gesture On' : 'Gesture Off';
+    }
+    if (!on) {
+      this.cameraPreviewOn_1 = false;
+      var tmp_0 = document.getElementById('btnCamPreview');
+      var tmp1_safe_receiver = tmp_0 instanceof HTMLElement ? tmp_0 : null;
+      if (tmp1_safe_receiver != null) {
+        tmp1_safe_receiver.textContent = 'Camera Off';
+      }
+      window._cameraPreviewOn = false;
+      var cp = document.getElementById('cameraPreview');
+      if (cp)
+        cp.style.display = 'none';
     }
   };
   protoOf(HtmlOverlay).updateBreathing_s8fab_k$ = function (dt) {

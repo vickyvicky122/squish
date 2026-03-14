@@ -39,7 +39,7 @@ config.devServer = {
   "open": true,
   "static": [
     "kotlin",
-    "..\\..\\..\\processedResources\\js\\main"
+    "../../../processedResources/js/main"
   ],
   "client": {
     "overlay": {

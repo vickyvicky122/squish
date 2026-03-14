@@ -71,16 +71,17 @@ class HtmlOverlay(
         // -- Section: Deform --
         sectionDeform = createSection("section-deform", """
             <div class="section-hint">
-                drag to rotate · scroll to zoom · press keys to deform
+                drag to rotate · scroll to zoom · keys to deform
             </div>
             <div class="deform-controls">
                 <button class="pill-btn" id="btnReset">Reset</button>
                 <button class="pill-btn" id="btnSound">Sound Off</button>
                 <button class="pill-btn" id="btnTheme">Theme</button>
                 <button class="pill-btn" id="btnColor">Color</button>
-                <button class="pill-btn" id="btnStyle">Style: Calm Jelly</button>
-                <button class="pill-btn" id="btnScale">Size: Normal</button>
-                <button class="pill-btn" id="btnGesture">Gesture: Off</button>
+                <button class="pill-btn" id="btnStyle">Calm Jelly</button>
+                <button class="pill-btn" id="btnScale">Normal</button>
+                <button class="pill-btn" id="btnGesture">Gesture Off</button>
+                <button class="pill-btn" id="btnCamPreview">Camera Off</button>
             </div>
         """.trimIndent())
         document.body?.appendChild(sectionDeform!!)
@@ -96,6 +97,7 @@ class HtmlOverlay(
         document.getElementById("btnStyle")?.addEventListener("click", { onCycleStyle() })
         document.getElementById("btnScale")?.addEventListener("click", { onCycleScale() })
         document.getElementById("btnGesture")?.addEventListener("click", { onToggleGesture() })
+        document.getElementById("btnCamPreview")?.addEventListener("click", { toggleCameraPreview() })
 
         // -- Section: Focus (Breathing) --
         sectionFocus = createSection("section-focus", """
@@ -146,19 +148,19 @@ class HtmlOverlay(
             id = "nav"
             innerHTML = """
                 <button class="nav-btn active" data-section="deform">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8c-2 0-3.5 1.5-3.5 4s1.5 4 3.5 4 3.5-1.5 3.5-4-1.5-4-3.5-4z"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8c-2 0-3.5 1.5-3.5 4s1.5 4 3.5 4 3.5-1.5 3.5-4-1.5-4-3.5-4z"/></svg>
                     <span>Deform</span>
                 </button>
                 <button class="nav-btn" data-section="focus">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                     <span>Focus</span>
                 </button>
                 <button class="nav-btn" data-section="motivation">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                     <span>Motivation</span>
                 </button>
                 <button class="nav-btn" data-section="calm">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/></svg>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/></svg>
                     <span>Calm</span>
                 </button>
             """.trimIndent()
@@ -237,16 +239,39 @@ class HtmlOverlay(
     }
 
     fun updateScaleLabel(label: String) {
-        (document.getElementById("btnScale") as? HTMLElement)?.textContent = "Size: $label"
+        (document.getElementById("btnScale") as? HTMLElement)?.textContent = label
     }
 
     fun updateStyleLabel(label: String) {
-        (document.getElementById("btnStyle") as? HTMLElement)?.textContent = "Style: $label"
+        (document.getElementById("btnStyle") as? HTMLElement)?.textContent = label
     }
 
     fun updateGestureLabel(on: Boolean) {
         (document.getElementById("btnGesture") as? HTMLElement)?.textContent =
-            if (on) "Gesture: On" else "Gesture: Off"
+            if (on) "Gesture On" else "Gesture Off"
+        // Hide camera preview when gesture is turned off
+        if (!on) {
+            cameraPreviewOn = false
+            (document.getElementById("btnCamPreview") as? HTMLElement)?.textContent = "Camera Off"
+            js("window._cameraPreviewOn=false")
+            js("var cp=document.getElementById('cameraPreview');if(cp)cp.style.display='none'")
+        }
+    }
+
+    private var cameraPreviewOn = false
+
+    private fun toggleCameraPreview() {
+        cameraPreviewOn = !cameraPreviewOn
+        (document.getElementById("btnCamPreview") as? HTMLElement)?.textContent =
+            if (cameraPreviewOn) "Camera On" else "Camera Off"
+        if (cameraPreviewOn) {
+            js("window._cameraPreviewOn = true")
+            js("if(!document.getElementById('cameraPreview')){var c=document.createElement('canvas');c.id='cameraPreview';c.className='camera-preview';c.width=320;c.height=240;document.body.appendChild(c);}")
+            js("document.getElementById('cameraPreview').style.display=''")
+        } else {
+            js("window._cameraPreviewOn = false")
+            js("var cp=document.getElementById('cameraPreview');if(cp)cp.style.display='none'")
+        }
     }
 
     // -- Motivation --
