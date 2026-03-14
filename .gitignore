@@ -50,3 +50,4 @@ $RECYCLE.BIN/
 #  Local / machine-specific config
 # ============================================================
 local.properties
+.gradle/
