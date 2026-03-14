@@ -25,7 +25,6 @@ config.output = {
     libraryTarget: "umd",
     globalObject: "this"
 };
-config.output.path = require('path').resolve(__dirname, "../../../dist/js/developmentExecutable")
     // source maps
     config.module.rules.push({
             test: /\.js$/,
@@ -35,6 +34,21 @@ config.output.path = require('path').resolve(__dirname, "../../../dist/js/develo
     config.devtool = 'eval-source-map';
 config.ignoreWarnings = [/Failed to parse source map/]
     
+// dev server
+config.devServer = {
+  "open": true,
+  "static": [
+    "kotlin",
+    "../../../processedResources/js/main"
+  ],
+  "client": {
+    "overlay": {
+      "errors": true,
+      "warnings": false
+    }
+  }
+};
+
 // Report progress to console
 // noinspection JSUnnecessarySemicolon
 ;(function(config) {

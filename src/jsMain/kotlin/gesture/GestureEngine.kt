@@ -2,6 +2,7 @@ package gesture
 
 import kotlin.math.abs
 import kotlin.math.hypot
+import kotlin.math.sqrt
 
 enum class HandGesture(val label: String) {
     NONE("No hand"),
@@ -13,8 +14,34 @@ enum class HandGesture(val label: String) {
     THUMBS_UP("Thumbs Up"),
     SPREAD("Explode!"),
     HORNS("Scramble!"),
-    PUNCH("Punch!")
+    PUNCH("Punch!"),
+    PINCH("Pinch"),
+    PULL("Pull"),
+    SLAP("Slap!"),
+    KNEAD("Knead"),
+    TWO_HAND_RESIZE("Resize")
 }
+
+/**
+ * 3D landmark data for a single fingertip, with estimated depth.
+ * x/y are normalized webcam coords (0-1), z is MediaPipe's relative depth.
+ */
+data class Finger3D(
+    val x: Double, val y: Double, val z: Double,
+    val ndcX: Double, val ndcY: Double
+)
+
+/**
+ * Full 3D hand state derived from MediaPipe landmarks.
+ */
+data class Hand3DState(
+    val wristX: Double, val wristY: Double, val wristZ: Double,
+    val palmCenterX: Double, val palmCenterY: Double, val palmCenterZ: Double,
+    val fingers: List<Finger3D>,  // 5 fingertips: thumb(4), index(8), middle(12), ring(16), pinky(20)
+    val palmSpan: Double,         // distance from wrist(0) to middle MCP(9) — proxy for depth
+    val handScale: Double,        // overall hand size in normalized coords — depth proxy
+    val estimatedDepth: Double    // estimated Z distance from camera (higher = closer)
+)
 
 class GestureEngine {
     var enabled = false
@@ -22,6 +49,10 @@ class GestureEngine {
     var currentGesture = HandGesture.NONE
         private set
     var handDetected = false
+        private set
+
+    // Second hand state
+    var hand2Detected = false
         private set
 
     // Normalized hand position (0-1, webcam coords)
@@ -42,6 +73,45 @@ class GestureEngine {
     var handDeltaY = 0.0
         private set
 
+    // 3D hand state
+    var hand3D: Hand3DState? = null
+        private set
+    var hand2_3D: Hand3DState? = null
+        private set
+
+    // Pinch state tracking
+    var pinchAmount = 0.0   // 0 = open, 1 = fully pinched
+        private set
+    var prevPinchAmount = 0.0
+        private set
+
+    // Two-hand distance for resize
+    var twoHandDistance = 0.0
+        private set
+    var prevTwoHandDistance = 0.0
+        private set
+    var twoHandResizeDelta = 0.0  // positive = spreading apart, negative = pushing together
+        private set
+    // Center point between two hands (for interaction position)
+    var twoHandCenterX = 0.5
+        private set
+    var twoHandCenterY = 0.5
+        private set
+
+    // Hand velocity (magnitude per frame)
+    var handVelocity = 0.0
+        private set
+
+    // Depth change rate (moving toward/away from camera)
+    var depthDelta = 0.0
+        private set
+    private var prevDepth = 0.0
+
+    // Knead state — alternating squeeze cycles
+    private var kneadPhase = 0.0
+    var kneadIntensity = 0.0
+        private set
+
     private var prevHandX = 0.5
     private var prevHandY = 0.5
 
@@ -56,6 +126,12 @@ class GestureEngine {
     private var explodeCooldown = 0.0
     private var scrambleCooldown = 0.0
     private var punchCooldown = 0.0
+    private var slapCooldown = 0.0
+    private var pullCooldown = 0.0
+
+    // History for velocity smoothing
+    private val velocityHistory = DoubleArray(5)
+    private var velocityIdx = 0
 
     fun toggle(): Boolean {
         if (enabled) stop() else start()
@@ -77,8 +153,14 @@ class GestureEngine {
         js("window.stopGesture()")
         currentGesture = HandGesture.NONE
         handDetected = false
+        hand2Detected = false
         handDeltaX = 0.0
         handDeltaY = 0.0
+        hand3D = null
+        hand2_3D = null
+        pinchAmount = 0.0
+        twoHandDistance = 0.0
+        twoHandResizeDelta = 0.0
     }
 
     /** Call each frame from animation loop */
@@ -90,14 +172,19 @@ class GestureEngine {
         explodeCooldown = (explodeCooldown - dt).coerceAtLeast(0.0)
         scrambleCooldown = (scrambleCooldown - dt).coerceAtLeast(0.0)
         punchCooldown = (punchCooldown - dt).coerceAtLeast(0.0)
+        slapCooldown = (slapCooldown - dt).coerceAtLeast(0.0)
+        pullCooldown = (pullCooldown - dt).coerceAtLeast(0.0)
 
         val detected: Boolean = js("window._handDetected === true") as Boolean
         if (!detected) {
             handDetected = false
+            hand2Detected = false
             currentGesture = HandGesture.NONE
             handDeltaX = 0.0
             handDeltaY = 0.0
-            // Update label
+            hand3D = null
+            hand2_3D = null
+            depthDelta = 0.0
             val label: dynamic = js("document.getElementById('gestureLabel')")
             if (label != null) {
                 label.textContent = "No hand"
@@ -108,6 +195,11 @@ class GestureEngine {
         handDetected = true
         val lm: dynamic = js("window._handLandmarks")
         if (lm == null) return
+
+        // Read second hand
+        val h2detected: Boolean = js("window._hand2Detected === true") as Boolean
+        hand2Detected = h2detected
+        val lm2: dynamic = if (h2detected) js("window._hand2Landmarks") else null
 
         // Update hand position (wrist = landmark 0)
         prevHandX = handX
@@ -121,8 +213,61 @@ class GestureEngine {
         fingerTipX = lm[8].x as Double
         fingerTipY = lm[8].y as Double
 
+        // Build 3D hand state
+        hand3D = build3DState(lm)
+        hand2_3D = if (lm2 != null) build3DState(lm2) else null
+
+        // Track depth changes
+        val currentDepth = hand3D?.estimatedDepth ?: 0.0
+        depthDelta = currentDepth - prevDepth
+        prevDepth = currentDepth
+
+        // Compute hand velocity (smoothed)
+        val rawVel = hypot(handDeltaX, handDeltaY)
+        velocityHistory[velocityIdx % 5] = rawVel
+        velocityIdx++
+        handVelocity = velocityHistory.average()
+
+        // Compute pinch amount (thumb tip to index tip distance)
+        val thumbTipX = lm[4].x as Double
+        val thumbTipY = lm[4].y as Double
+        val thumbTipZ = (lm[4].z as? Double) ?: 0.0
+        val indexTipX = lm[8].x as Double
+        val indexTipY = lm[8].y as Double
+        val indexTipZ = (lm[8].z as? Double) ?: 0.0
+        val pinchDist = sqrt(
+            (thumbTipX - indexTipX) * (thumbTipX - indexTipX) +
+            (thumbTipY - indexTipY) * (thumbTipY - indexTipY) +
+            (thumbTipZ - indexTipZ) * (thumbTipZ - indexTipZ)
+        )
+        prevPinchAmount = pinchAmount
+        // Map distance to 0-1 range: ~0.15 = open, ~0.03 = pinched
+        pinchAmount = (1.0 - ((pinchDist - 0.03) / 0.12).coerceIn(0.0, 1.0))
+
+        // Two-hand resize tracking
+        if (hand2Detected && hand2_3D != null) {
+            prevTwoHandDistance = twoHandDistance
+            val h1 = hand3D!!
+            val h2 = hand2_3D!!
+            twoHandDistance = hypot(h1.palmCenterX - h2.palmCenterX, h1.palmCenterY - h2.palmCenterY)
+            twoHandResizeDelta = twoHandDistance - prevTwoHandDistance
+            twoHandCenterX = (h1.palmCenterX + h2.palmCenterX) / 2.0
+            twoHandCenterY = (h1.palmCenterY + h2.palmCenterY) / 2.0
+        } else {
+            twoHandResizeDelta = 0.0
+        }
+
+        // Knead tracking (continuous squeeze-release cycling)
+        if (currentGesture == HandGesture.KNEAD) {
+            kneadPhase += dt * 3.0
+            kneadIntensity = (kotlin.math.sin(kneadPhase) + 1.0) / 2.0  // 0-1 oscillation
+        } else {
+            kneadPhase = 0.0
+            kneadIntensity = 0.0
+        }
+
         // Classify gesture
-        val detectedGesture = classifyGesture(lm)
+        val detectedGesture = classifyGesture(lm, lm2)
 
         // Smoothing: require same gesture for N consecutive frames
         if (detectedGesture == rawGesture) {
@@ -138,9 +283,15 @@ class GestureEngine {
 
         // Upgrade fist → punch when hand is moving fast
         if (currentGesture == HandGesture.CLOSE) {
-            val velocity = hypot(handDeltaX, handDeltaY)
-            if (velocity > 0.025) {
+            if (handVelocity > 0.025) {
                 currentGesture = HandGesture.PUNCH
+            }
+        }
+
+        // Upgrade open palm → slap when hand is moving very fast sideways
+        if (currentGesture == HandGesture.OPEN) {
+            if (handVelocity > 0.04) {
+                currentGesture = HandGesture.SLAP
             }
         }
 
@@ -149,6 +300,67 @@ class GestureEngine {
         if (label != null) {
             label.textContent = currentGesture.label
         }
+    }
+
+    /** Build a 3D hand state from MediaPipe landmarks */
+    private fun build3DState(lm: dynamic): Hand3DState {
+        val wristX = lm[0].x as Double
+        val wristY = lm[0].y as Double
+        val wristZ = (lm[0].z as? Double) ?: 0.0
+
+        // Palm center = average of wrist(0), index MCP(5), middle MCP(9), ring MCP(13), pinky MCP(17)
+        val palmIndices = intArrayOf(0, 5, 9, 13, 17)
+        var pcx = 0.0; var pcy = 0.0; var pcz = 0.0
+        for (idx in palmIndices) {
+            pcx += lm[idx].x as Double
+            pcy += lm[idx].y as Double
+            pcz += (lm[idx].z as? Double) ?: 0.0
+        }
+        pcx /= palmIndices.size
+        pcy /= palmIndices.size
+        pcz /= palmIndices.size
+
+        // Fingertip positions (landmarks 4,8,12,16,20)
+        val tipIndices = intArrayOf(4, 8, 12, 16, 20)
+        val fingers = tipIndices.map { idx ->
+            val fx = lm[idx].x as Double
+            val fy = lm[idx].y as Double
+            val fz = (lm[idx].z as? Double) ?: 0.0
+            // Convert to NDC (mirrored for webcam)
+            val ndcX = 1.0 - 2.0 * fx
+            val ndcY = 1.0 - 2.0 * fy
+            Finger3D(fx, fy, fz, ndcX, ndcY)
+        }
+
+        // Palm span: wrist to middle MCP — larger = hand closer to camera
+        val midMcpX = lm[9].x as Double
+        val midMcpY = lm[9].y as Double
+        val palmSpan = hypot(wristX - midMcpX, wristY - midMcpY)
+
+        // Hand scale: bounding box of all key landmarks — depth proxy
+        var minX = 1.0; var maxX = 0.0; var minY = 1.0; var maxY = 0.0
+        val allIndices = intArrayOf(0, 4, 8, 12, 16, 20, 5, 9, 13, 17)
+        for (idx in allIndices) {
+            val lx = lm[idx].x as Double
+            val ly = lm[idx].y as Double
+            if (lx < minX) minX = lx
+            if (lx > maxX) maxX = lx
+            if (ly < minY) minY = ly
+            if (ly > maxY) maxY = ly
+        }
+        val handScale = hypot(maxX - minX, maxY - minY)
+
+        // Estimated depth: use palm span as primary proxy
+        // Average human hand wrist-to-middle-MCP is ~8cm
+        // At ~50cm distance, this spans ~0.16 in normalized coords
+        // Depth increases as the span increases (hand is closer)
+        val estimatedDepth = palmSpan / 0.16  // ~1.0 at "normal" distance
+
+        return Hand3DState(
+            wristX, wristY, wristZ,
+            pcx, pcy, pcz,
+            fingers, palmSpan, handScale, estimatedDepth
+        )
     }
 
     /** Check if reset action should fire (debounced) */
@@ -193,11 +405,32 @@ class GestureEngine {
         return false
     }
 
+    fun shouldSlap(): Boolean {
+        if (currentGesture == HandGesture.SLAP && slapCooldown <= 0.0) {
+            slapCooldown = 0.5
+            return true
+        }
+        return false
+    }
+
+    fun shouldPull(): Boolean {
+        if (currentGesture == HandGesture.PULL && pullCooldown <= 0.0) {
+            pullCooldown = 0.3
+            return true
+        }
+        return false
+    }
+
     /** Convert fingertip position to NDC for raycaster (accounts for webcam mirror) */
     fun getFingerNDC(): Pair<Double, Double> {
         val ndcX = 1.0 - 2.0 * fingerTipX
         val ndcY = 1.0 - 2.0 * fingerTipY
         return Pair(ndcX, ndcY)
+    }
+
+    /** Get all fingertip NDC positions for multi-point collision */
+    fun getAllFingerNDC(): List<Pair<Double, Double>> {
+        return hand3D?.fingers?.map { Pair(it.ndcX, it.ndcY) } ?: emptyList()
     }
 
     /** Convert hand movement to rotation values (mirrored for natural feel) */
@@ -206,7 +439,7 @@ class GestureEngine {
         return Pair(handDeltaY * 4.0, -handDeltaX * 4.0)
     }
 
-    private fun classifyGesture(lm: dynamic): HandGesture {
+    private fun classifyGesture(lm: dynamic, lm2: dynamic?): HandGesture {
         val thumbUp = isThumbExtended(lm)
         val indexUp = isFingerExtended(lm, 6, 8)
         val middleUp = isFingerExtended(lm, 10, 12)
@@ -220,7 +453,20 @@ class GestureEngine {
         val indexTipY = lm[8].y as Double
         val okDist = hypot(thumbTipX - indexTipX, thumbTipY - indexTipY)
 
+        // Two-hand resize takes priority when both hands detected
+        if (lm2 != null && hand2Detected) {
+            val index2Up = isFingerExtended(lm2, 6, 8)
+            val middle2Up = isFingerExtended(lm2, 10, 12)
+            val ring2Up = isFingerExtended(lm2, 14, 16)
+            val bothOpen = (indexUp && middleUp && ringUp) && (index2Up && middle2Up && ring2Up)
+            if (bothOpen) return HandGesture.TWO_HAND_RESIZE
+        }
+
         return when {
+            // Pinch: thumb+index close, other fingers relaxed (different from OK which requires other fingers up)
+            okDist < 0.06 && !middleUp && !ringUp && !pinkyUp -> HandGesture.PINCH
+            // Pull: pinch + hand moving away from camera (depth increasing)
+            okDist < 0.06 && depthDelta < -0.003 -> HandGesture.PULL
             // OK sign: thumb+index touching, at least one other finger extended
             okDist < 0.06 && (middleUp || ringUp || pinkyUp) -> HandGesture.OK
             // Spread / jazz hands: ALL 5 fingers including thumb → explode
@@ -233,6 +479,8 @@ class GestureEngine {
             thumbUp && !indexUp && !middleUp && !ringUp && !pinkyUp -> HandGesture.THUMBS_UP
             // Pointer: only index extended (no pinky — distinguishes from horns)
             indexUp && !middleUp && !ringUp && !pinkyUp -> HandGesture.POINTER
+            // Knead: 3 fingers (index+middle+ring) curled, doing a squeezing motion with palm visible
+            !thumbUp && !indexUp && !middleUp && ringUp && pinkyUp -> HandGesture.KNEAD
             // Open palm: 4 fingers extended, thumb not (distinguishes from spread)
             !thumbUp && indexUp && middleUp && ringUp && pinkyUp -> HandGesture.OPEN
             // Closed fist: no fingers extended (upgraded to PUNCH in update if moving fast)

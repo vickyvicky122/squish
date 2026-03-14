@@ -21,11 +21,11 @@ class SpringPhysics(private val geometry: BufferGeometry) {
     var totalEnergy: Double = 0.0
         private set
 
-    // Foam rubber: soft spring, heavy damping — squishes and slowly puffs back
-    private val springConstant = 8.0
-    private val dampingCoeff = 4.5
-    var maxOffset = 1.2
-    var maxVelocity = 6.0
+    // Water balloon: soft spring, low damping — yielding, lots of jiggle/oscillation
+    private val springConstant = 3.0
+    private val dampingCoeff = 1.2
+    var maxOffset = 2.0
+    var maxVelocity = 10.0
 
     init {
         val posArray = posAttr.array
