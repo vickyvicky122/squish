@@ -1,0 +1,10 @@
+abi_version=1.8.0
+builtins_platform=JS
+compiler_version=1.9.21
+depends=org.jetbrains.kotlin\:kotlin-dom-api-compat kotlin
+ir_signature_versions=1,2
+jsOutputName=squishy-blob
+metadata_version=1.4.1
+serializedIrFileFingerprints=nso16vapu937.313qqt3usxz3k 6e4m8ku2wogc.31jb5ww6fd256 3tsxxw7z7bim1.1dpzd0e1dl6ll 1643728fjn6yr.cctmk4gt613j 1ldkharskglwh.2l7vu5earaywd 2fyb2t3rm4ccr.3hn3r9a5t0sg1 2ne9idbthyvwj.1geaxswczpexu 2gg3bazn2knff.258m3p0j5ffo7 21hebxqnkuv27.2xrxoxjlu5y2q 3nqn0lg0f4t2y.gs7bo3a47g6s 3r2rwkz45pgkz.iazjevbmhtdp 1mb1r8jhol721.2jgjwklxirb8c
+serializedKlibFingerprint=2cbstpv9i5v1g.27d60c02wukc7
+unique_name=squishy-blob
