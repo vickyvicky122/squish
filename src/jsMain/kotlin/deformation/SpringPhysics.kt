@@ -31,6 +31,9 @@ class SpringPhysics(private val geometry: BufferGeometry) {
     private val originalAvgRadius: Double
     var volumePreservation = 0.7  // 0 = off, 1 = rigid volume
 
+    // Neighbor adjacency for Laplacian smoothing
+    private val neighbors: Array<IntArray>
+
     init {
         val posArray = posAttr.array
         var radSum = 0.0
@@ -44,6 +47,33 @@ class SpringPhysics(private val geometry: BufferGeometry) {
             radSum += sqrt(ox * ox + oy * oy + oz * oz)
         }
         originalAvgRadius = radSum / vertexCount
+
+        // Build neighbor list from original positions (connect vertices within threshold distance)
+        neighbors = buildNeighbors()
+    }
+
+    private fun buildNeighbors(): Array<IntArray> {
+        // For a SphereGeometry, adjacent vertices are very close on the surface.
+        // Use distance threshold based on average edge length.
+        val threshold = originalAvgRadius * 0.18 // ~edge length for 64-segment sphere
+        val threshSq = threshold * threshold
+        val result = Array(vertexCount) { v ->
+            val ox = originalPositions[v * 3].toDouble()
+            val oy = originalPositions[v * 3 + 1].toDouble()
+            val oz = originalPositions[v * 3 + 2].toDouble()
+            val nbrs = mutableListOf<Int>()
+            for (u in 0 until vertexCount) {
+                if (u == v) continue
+                val dx = originalPositions[u * 3].toDouble() - ox
+                val dy = originalPositions[u * 3 + 1].toDouble() - oy
+                val dz = originalPositions[u * 3 + 2].toDouble() - oz
+                if (dx * dx + dy * dy + dz * dz < threshSq) {
+                    nbrs.add(u)
+                }
+            }
+            nbrs.toIntArray()
+        }
+        return result
     }
 
     fun update(rawDt: Double) {
@@ -99,6 +129,27 @@ class SpringPhysics(private val geometry: BufferGeometry) {
                     }
                 }
             }
+        }
+
+        // Laplacian smoothing — blend each vertex toward its neighbors' average
+        val smoothStrength = 0.3
+        val tempPos = Float32Array(vertexCount * 3)
+        for (i in 0 until vertexCount * 3) {
+            tempPos[i] = posArray[i]
+        }
+        for (v in 0 until vertexCount) {
+            val nbrs = neighbors[v]
+            if (nbrs.isEmpty()) continue
+            var ax = 0.0; var ay = 0.0; var az = 0.0
+            for (n in nbrs) {
+                ax += tempPos[n * 3].toDouble()
+                ay += tempPos[n * 3 + 1].toDouble()
+                az += tempPos[n * 3 + 2].toDouble()
+            }
+            ax /= nbrs.size; ay /= nbrs.size; az /= nbrs.size
+            posArray[v * 3] = (posArray[v * 3] + (ax - posArray[v * 3]) * smoothStrength).toFloat()
+            posArray[v * 3 + 1] = (posArray[v * 3 + 1] + (ay - posArray[v * 3 + 1]) * smoothStrength).toFloat()
+            posArray[v * 3 + 2] = (posArray[v * 3 + 2] + (az - posArray[v * 3 + 2]) * smoothStrength).toFloat()
         }
 
         posAttr.needsUpdate = true

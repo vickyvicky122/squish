@@ -124,7 +124,7 @@ fun main() {
     scene.add(accentLight)
 
     // === Geometry ===
-    val geometry = SphereGeometry(2.0, 32, 24)
+    val geometry = SphereGeometry(2.0, 64, 48)
     val posAttr = geometry.getAttribute("position") as BufferAttribute
     val vertexCount = posAttr.count
     val colorArray = Float32Array(vertexCount * 3)
@@ -208,11 +208,11 @@ fun main() {
         sheenColor: 0xffffff,
         iridescence: 0.15,
         iridescenceIOR: 1.33,
-        transmission: 0.85,
-        thickness: 1.5,
+        transmission: 0.3,
+        thickness: 2.5,
         ior: 1.33,
         transparent: true,
-        opacity: 0.95,
+        opacity: 1.0,
         envMapIntensity: 2.0
     })"""))
     val blob = Mesh(geometry, material)
@@ -287,11 +287,11 @@ fun main() {
                 material.sheenRoughness = 0.0
                 material.iridescence = 0.15
                 material.iridescenceIOR = 1.33
-                material.transmission = 0.85
-                material.thickness = 1.5
+                material.transmission = 0.3
+                material.thickness = 2.5
                 material.ior = 1.33
                 material.transparent = true
-                material.opacity = 0.95
+                material.opacity = 1.0
                 material.bumpMap = null
                 material.bumpScale = 0.0
                 material.roughnessMap = null
@@ -306,11 +306,11 @@ fun main() {
                 material.sheenRoughness = 0.4
                 material.iridescence = 0.0
                 material.iridescenceIOR = 1.5
-                material.transmission = 0.6
-                material.thickness = 2.5
+                material.transmission = 0.2
+                material.thickness = 3.0
                 material.ior = 1.45
                 material.transparent = true
-                material.opacity = 0.9
+                material.opacity = 1.0
                 material.bumpMap = foamBumpTex
                 material.bumpScale = 0.04
                 material.roughnessMap = null
@@ -325,11 +325,11 @@ fun main() {
                 material.sheenRoughness = 0.0
                 material.iridescence = 0.8
                 material.iridescenceIOR = 2.0
-                material.transmission = 0.95
-                material.thickness = 0.5
+                material.transmission = 0.45
+                material.thickness = 1.5
                 material.ior = 1.8
                 material.transparent = true
-                material.opacity = 0.98
+                material.opacity = 1.0
                 material.bumpMap = null
                 material.bumpScale = 0.0
                 material.roughnessMap = null
@@ -344,11 +344,11 @@ fun main() {
                 material.sheenRoughness = 0.0
                 material.iridescence = 1.0
                 material.iridescenceIOR = 1.8
-                material.transmission = 0.92
-                material.thickness = 0.1
+                material.transmission = 0.55
+                material.thickness = 0.5
                 material.ior = 1.3
                 material.transparent = true
-                material.opacity = 0.5
+                material.opacity = 0.7
                 material.bumpMap = null
                 material.bumpScale = 0.0
                 material.roughnessMap = null

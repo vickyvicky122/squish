@@ -165,6 +165,10 @@ class HtmlOverlay(
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8c-2 0-3.5 1.5-3.5 4s1.5 4 3.5 4 3.5-1.5 3.5-4-1.5-4-3.5-4z"/></svg>
                     <span>Deform</span>
                 </button>
+                <button class="nav-btn" data-section="strings">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="4" y2="20"/><line x1="20" y1="4" x2="20" y2="20"/><path d="M4 8 Q12 12 20 8"/><path d="M4 14 Q12 18 20 14"/></svg>
+                    <span>Strings</span>
+                </button>
                 <button class="nav-btn" data-section="focus">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                     <span>Focus</span>
@@ -176,10 +180,6 @@ class HtmlOverlay(
                 <button class="nav-btn" data-section="calm">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/></svg>
                     <span>Calm</span>
-                </button>
-                <button class="nav-btn" data-section="strings">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="4" y2="20"/><line x1="20" y1="4" x2="20" y2="20"/><path d="M4 8 Q12 12 20 8"/><path d="M4 14 Q12 18 20 14"/></svg>
-                    <span>Strings</span>
                 </button>
             """.trimIndent()
         }
