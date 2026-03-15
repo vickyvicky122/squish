@@ -19,6 +19,12 @@ class InputHandler {
     var clickY: Double = Double.NaN
         private set
 
+    // Current mouse position in NDC (-1 to +1)
+    var mouseX: Double = 0.0
+        private set
+    var mouseY: Double = 0.0
+        private set
+
     // Rotation with inertia
     var rotVelX: Double = 0.0
         private set
@@ -56,6 +62,8 @@ class InputHandler {
 
         document.addEventListener("mousemove", { event ->
             val e = event as MouseEvent
+            mouseX = (e.clientX.toDouble() / window.innerWidth) * 2.0 - 1.0
+            mouseY = -(e.clientY.toDouble() / window.innerHeight) * 2.0 + 1.0
             if (isMouseDown) {
                 val dx = e.clientX.toDouble() - lastMouseX
                 val dy = e.clientY.toDouble() - lastMouseY

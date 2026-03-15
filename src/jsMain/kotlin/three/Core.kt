@@ -13,6 +13,7 @@ external class Scene : Object3D {
 }
 
 open external class Object3D {
+    var visible: Boolean
     val position: Vector3
     val rotation: Euler
     val scale: Vector3
@@ -80,7 +81,36 @@ open external class BufferGeometry {
     fun getAttribute(name: String): BufferAttribute
     fun setAttribute(name: String, attribute: BufferAttribute): BufferGeometry
     fun computeVertexNormals()
+    fun dispose()
     val attributes: dynamic
+}
+
+external class TubeGeometry(
+    path: dynamic,
+    tubularSegments: Int = definedExternally,
+    radius: Double = definedExternally,
+    radialSegments: Int = definedExternally,
+    closed: Boolean = definedExternally
+) : BufferGeometry
+
+external class CatmullRomCurve3(points: Array<Vector3>) {
+    var curveType: String
+    var tension: Double
+}
+
+external class Line(
+    geometry: BufferGeometry = definedExternally,
+    material: dynamic = definedExternally
+) : Object3D {
+    val geometry: BufferGeometry
+    val material: dynamic
+}
+
+external class LineBasicMaterial(params: dynamic = definedExternally) {
+    var color: Color
+    var linewidth: Double
+    var transparent: Boolean
+    var opacity: Double
 }
 
 open external class Texture {

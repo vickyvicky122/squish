@@ -7,14 +7,59 @@ class SoundEngine {
     private var droneGain: dynamic = null
     private var isDroneActive = false
 
+    // Pre-loaded audio sample buffers stored as a plain JS object on window
+    private val sampleStore: dynamic = js("(window.__sampleBuffers = window.__sampleBuffers || {})")
+
+    init {
+        loadSamples()
+    }
+
+    private fun loadSamples() {
+        val audioCtx = ctx
+        val store = sampleStore
+        val files = js("""[
+            ['bouncy-slime','audio/bouncy-slime.mp3'],
+            ['clean-slice','audio/clean-slice.mp3'],
+            ['paper-into-ball','audio/paper-into-ball.mp3'],
+            ['rythmic-slime','audio/rythmic-slime.wav'],
+            ['splat','audio/splat.mp3'],
+            ['wet-slime','audio/wet-slime.mp3'],
+            ['whoosh','audio/whoosh.mp3']
+        ]""")
+        js("""
+            files.forEach(function(entry) {
+                var sname = entry[0], surl = entry[1];
+                fetch(surl).then(function(r){return r.arrayBuffer();})
+                .then(function(b){return audioCtx.decodeAudioData(b);})
+                .then(function(d){store[sname]=d; console.log('Loaded: '+sname);})
+                .catch(function(e){console.warn('Failed: '+sname,e);});
+            });
+        """)
+    }
+
+    /** Play a pre-loaded sample by name, with optional volume and playback rate */
+    private fun playSample(name: String, volume: Double = 0.5, rate: Double = 1.0) {
+        val buf = sampleStore[name] ?: return
+        ensureResumed()
+        val source = ctx.createBufferSource()
+        source.buffer = buf
+        source.playbackRate.value = rate
+        val gain = ctx.createGain()
+        gain.gain.value = volume
+        source.connect(gain)
+        gain.connect(ctx.destination)
+        source.start(0)
+    }
+
     fun ensureResumed() {
         if (ctx.state == "suspended") {
             ctx.resume()
         }
     }
 
-    /** Soft foam thud on poke — muffled low-frequency impact */
+    /** Soft foam thud on poke — bouncy slime sample + synth */
     fun playPoke() {
+        playSample("bouncy-slime", volume = 0.35, rate = 1.2)
         ensureResumed()
         val now = ctx.currentTime as Double
         val osc = ctx.createOscillator()
@@ -29,7 +74,7 @@ class SoundEngine {
         filter.frequency.setValueAtTime(600, now)
         filter.frequency.exponentialRampToValueAtTime(100, now + 0.25)
 
-        gain.gain.setValueAtTime(0.3, now)
+        gain.gain.setValueAtTime(0.15, now)
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3)
 
         osc.connect(filter)
@@ -40,8 +85,9 @@ class SoundEngine {
         osc.stop(now + 0.35)
     }
 
-    /** Soft puff on pulse — foam expanding */
+    /** Soft puff on pulse — whoosh sample + foam expanding */
     fun playPulse() {
+        playSample("whoosh", volume = 0.25, rate = 1.5)
         ensureResumed()
         val now = ctx.currentTime as Double
 
@@ -85,8 +131,9 @@ class SoundEngine {
         osc.stop(now + 0.28)
     }
 
-    /** Soft exhale on reset — foam puffing back to shape */
+    /** Soft exhale on reset — whoosh sample + foam puffing back to shape */
     fun playReset() {
+        playSample("whoosh", volume = 0.3, rate = 0.7)
         ensureResumed()
         val now = ctx.currentTime as Double
 
@@ -153,8 +200,9 @@ class SoundEngine {
         isDroneActive = true
     }
 
-    /** Soft squish sound for squeeze/stretch — muffled foam compression */
+    /** Soft squish sound for squeeze/stretch — wet slime sample + muffled foam compression */
     fun playSquish(intensity: Double) {
+        playSample("wet-slime", volume = intensity * 0.3, rate = 0.8 + intensity * 0.4)
         ensureResumed()
         val now = ctx.currentTime as Double
 
@@ -209,8 +257,9 @@ class SoundEngine {
 
     // ========== ASMR gesture sounds ==========
 
-    /** Explode — sparkly burst: bright pop + shimmering scatter + sub-bass thump */
+    /** Explode — splat sample + sparkly burst */
     fun playExplode() {
+        playSample("splat", volume = 0.4, rate = 0.8)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -276,8 +325,9 @@ class SoundEngine {
         bass.stop(now + 0.35)
     }
 
-    /** Scramble — crinkly rain stick: granular noise + wobbling filter + warble */
+    /** Scramble — paper crumple sample + crinkly rain stick */
     fun playScramble() {
+        playSample("paper-into-ball", volume = 0.35, rate = 1.3)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -338,8 +388,9 @@ class SoundEngine {
         shimmer.stop(now + 0.4)
     }
 
-    /** Punch — deep pillow thwack: transient thud + smack texture + boing tail */
+    /** Punch — splat sample + deep pillow thwack */
     fun playPunch() {
+        playSample("splat", volume = 0.5, rate = 1.1)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -394,8 +445,9 @@ class SoundEngine {
         boing.stop(now + 0.55)
     }
 
-    /** Expand — gentle whoosh: rising breathy noise + warm pad */
+    /** Expand — whoosh sample + gentle rising pad */
     fun playExpand() {
+        playSample("whoosh", volume = 0.3, rate = 0.9)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -439,8 +491,9 @@ class SoundEngine {
         pad.stop(now + 0.45)
     }
 
-    /** Squeeze — foam compression: descending tone + lowpass squish texture */
+    /** Squeeze — paper crumple sample + foam compression */
     fun playSqueeze() {
+        playSample("paper-into-ball", volume = 0.3, rate = 0.7)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -481,8 +534,9 @@ class SoundEngine {
         sqNoise.stop(now + 0.3)
     }
 
-    /** Stretch — taffy pull: smooth rising tone + breathy sweep */
+    /** Stretch — rythmic slime sample + taffy pull */
     fun playStretch() {
+        playSample("rythmic-slime", volume = 0.2, rate = 1.5)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -588,8 +642,9 @@ class SoundEngine {
         osc.stop(now + 0.25)
     }
 
-    /** Slap — sharp, bright impact with a ringing tail */
+    /** Slap — clean slice sample + sharp impact */
     fun playSlap() {
+        playSample("clean-slice", volume = 0.4, rate = 1.0)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -630,8 +685,9 @@ class SoundEngine {
         ring.stop(now + 0.3)
     }
 
-    /** Knead — continuous low rumble with pulsing character */
+    /** Knead — rythmic slime sample + continuous low rumble */
     fun playKnead() {
+        playSample("rythmic-slime", volume = 0.2, rate = 0.8)
         ensureResumed()
         val now = ctx.currentTime as Double
 
@@ -687,8 +743,9 @@ class SoundEngine {
         noise.stop(now + 0.25)
     }
 
-    /** Slice — sharp whoosh + clean separation: high-pass noise sweep + descending tone */
+    /** Slice — clean slice sample + sharp whoosh */
     fun playSlice() {
+        playSample("clean-slice", volume = 0.45, rate = 1.2)
         ensureResumed()
         val now = ctx.currentTime as Double
         val sr = ctx.sampleRate as Double
@@ -753,8 +810,102 @@ class SoundEngine {
         crack.stop(now + 0.08)
     }
 
-    /** Pull — stretchy taffy-pull sound */
+    /** Pluck — Karplus-Strong guitar string synthesis */
+    fun playPluck(frequency: Double = 330.0, intensity: Double = 0.8) {
+        ensureResumed()
+        val now = ctx.currentTime as Double
+        val sr = ctx.sampleRate as Double
+        val vol = (intensity * 0.3).coerceAtMost(0.4)
+
+        // Karplus-Strong: fill a buffer of length sampleRate/freq with noise,
+        // then let a comb-filtered feedback loop produce a pitched tone
+        val duration = 3.0
+        val totalSamples = (sr * duration).toInt()
+        val delayLen = (sr / frequency).toInt().coerceAtLeast(2)
+        val buffer = ctx.createBuffer(1, totalSamples, ctx.sampleRate)
+        val data = buffer.getChannelData(0)
+
+        // Delay line for Karplus-Strong
+        val delayLine = js("new Float32Array(delayLen)")
+        // Fill delay line with noise burst (the "pick" excitation)
+        for (i in 0 until delayLen) {
+            delayLine[i] = (kotlin.random.Random.nextDouble() * 2.0 - 1.0).toFloat()
+        }
+
+        var readIndex = 0
+        var prev = 0.0
+        val decay = 0.996 // controls sustain — higher = longer ring
+        val brightness = 0.5 // lowpass blend: 0 = muted, 1 = bright
+        for (i in 0 until totalSamples) {
+            val curr = (delayLine[readIndex] as Number).toDouble()
+            // Lowpass average of current and previous sample
+            val filtered = prev + brightness * (curr - prev)
+            prev = filtered
+            data[i] = (filtered * decay).toFloat()
+            delayLine[readIndex] = data[i]
+            readIndex = (readIndex + 1) % delayLen
+        }
+
+        val source = ctx.createBufferSource()
+        source.buffer = buffer
+
+        // Shape the envelope
+        val gain = ctx.createGain()
+        gain.gain.setValueAtTime(vol, now)
+        gain.gain.setValueAtTime(vol, now + duration * 0.7)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+
+        // Body resonance filter — gives it a guitar body tone
+        val bodyFilter = ctx.createBiquadFilter()
+        bodyFilter.type = "peaking"
+        bodyFilter.frequency.setValueAtTime(250, now)
+        bodyFilter.Q.setValueAtTime(1.5, now)
+        bodyFilter.gain.setValueAtTime(4, now)
+
+        source.connect(bodyFilter)
+        bodyFilter.connect(gain)
+        gain.connect(ctx.destination)
+        source.start(now)
+        source.stop(now + duration)
+    }
+
+    /** Strum — rapid cascade of guitar plucks in open chord */
+    fun playStrum(baseFreq: Double = 164.81) {
+        // Guitar open chord: E2, A2, D3, G3, B3, E4
+        val freqs = doubleArrayOf(baseFreq, baseFreq * 1.335, baseFreq * 1.782, baseFreq * 2.378, baseFreq * 3.0, baseFreq * 4.0)
+        for (i in freqs.indices) {
+            // Stagger each string by ~30ms like a real strum
+            js("setTimeout")(fun() { playPluck(freqs[i], 0.5) }, i * 30)
+        }
+    }
+
+    /** String stretch — tension creaking sound */
+    fun playStringStretch(tension: Double) {
+        ensureResumed()
+        val now = ctx.currentTime as Double
+        val freq = 80.0 + tension * 200.0
+
+        val osc = ctx.createOscillator()
+        osc.type = "sine"
+        osc.frequency.setValueAtTime(freq, now)
+        osc.frequency.linearRampToValueAtTime(freq * 1.3, now + 0.15)
+        val gain = ctx.createGain()
+        gain.gain.setValueAtTime(0.04, now)
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2)
+        val filter = ctx.createBiquadFilter()
+        filter.type = "bandpass"
+        filter.frequency.setValueAtTime(freq * 2.0, now)
+        filter.Q.setValueAtTime(3.0, now)
+        osc.connect(filter)
+        filter.connect(gain)
+        gain.connect(ctx.destination)
+        osc.start(now)
+        osc.stop(now + 0.25)
+    }
+
+    /** Pull — wet slime sample + stretchy taffy-pull */
     fun playPull() {
+        playSample("wet-slime", volume = 0.2, rate = 1.2)
         ensureResumed()
         val now = ctx.currentTime as Double
 

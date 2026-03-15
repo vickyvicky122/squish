@@ -11,7 +11,8 @@ class HtmlOverlay(
     private val onCycleTheme: () -> Unit,
     private val onCycleScale: () -> Unit = {},
     private val onCycleStyle: () -> Unit = {},
-    private val onToggleGesture: () -> Unit = {}
+    private val onToggleGesture: () -> Unit = {},
+    private val onResetStrings: () -> Unit = {}
 ) {
     private var quoteEl: HTMLElement? = null
     private var soundBtn: HTMLElement? = null
@@ -22,6 +23,7 @@ class HtmlOverlay(
     private var sectionFocus: HTMLElement? = null
     private var sectionMotivation: HTMLElement? = null
     private var sectionCalm: HTMLElement? = null
+    private var sectionStrings: HTMLElement? = null
 
     // Breathing state
     private var breathingActive = false
@@ -141,6 +143,20 @@ class HtmlOverlay(
         sectionCalm?.style?.display = "none"
         document.body?.appendChild(sectionCalm!!)
 
+        // -- Section: Strings --
+        sectionStrings = createSection("section-strings", """
+            <div class="strings-content">
+                <div class="strings-text">Pull and release.</div>
+                <div class="strings-subtext">Click &amp; drag to deform the graph · Space to pluck · R to reset</div>
+                <div class="strings-controls">
+                    <button class="pill-btn" id="btnStringsReset">Reset</button>
+                </div>
+            </div>
+        """.trimIndent())
+        sectionStrings?.style?.display = "none"
+        document.body?.appendChild(sectionStrings!!)
+        document.getElementById("btnStringsReset")?.addEventListener("click", { onResetStrings() })
+
         // -- Bottom Navigation --
         val nav = (document.createElement("nav") as HTMLElement).apply {
             id = "nav"
@@ -160,6 +176,10 @@ class HtmlOverlay(
                 <button class="nav-btn" data-section="calm">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/></svg>
                     <span>Calm</span>
+                </button>
+                <button class="nav-btn" data-section="strings">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="4" y2="20"/><line x1="20" y1="4" x2="20" y2="20"/><path d="M4 8 Q12 12 20 8"/><path d="M4 14 Q12 18 20 14"/></svg>
+                    <span>Strings</span>
                 </button>
             """.trimIndent()
         }
@@ -190,6 +210,7 @@ class HtmlOverlay(
         sectionFocus?.style?.display = if (name == "focus") "" else "none"
         sectionMotivation?.style?.display = if (name == "motivation") "" else "none"
         sectionCalm?.style?.display = if (name == "calm") "" else "none"
+        sectionStrings?.style?.display = if (name == "strings") "" else "none"
 
         // Update nav active state
         document.querySelectorAll(".nav-btn").asDynamic().forEach { btn: dynamic ->

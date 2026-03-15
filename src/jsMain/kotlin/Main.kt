@@ -6,6 +6,9 @@ import gesture.GestureEngine
 import gesture.HandGesture
 import kotlinx.browser.document
 import kotlinx.browser.window
+import strings.StringSystem
+import strings.StringRenderer
+import strings.StringInteraction
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.get
 import org.khronos.webgl.set
@@ -238,9 +241,17 @@ fun main() {
     val gestureEngine = GestureEngine()
     var gesturePokeCooldown = 0.0
 
+    // Strings system
+    val stringSystem = StringSystem(numStrings = 1, pointsPerString = 128)
+    val stringRenderer = StringRenderer(scene, stringSystem)
+    stringRenderer.setup()
+    var stringMouseDown = false
+
     // Input
     val inputHandler = InputHandler()
     inputHandler.setup()
+
+    val stringInteraction = StringInteraction(stringSystem, camera, inputHandler, gestureEngine)
 
     // === State ===
     var currentColorIndex = 0
@@ -377,6 +388,10 @@ fun main() {
         onToggleGesture = {
             val on = gestureEngine.toggle()
             overlayRef?.updateGestureLabel(on)
+        },
+        onResetStrings = {
+            stringSystem.reset()
+            if (soundEnabled) sound.playReset()
         }
     )
     overlayRef = overlay
@@ -441,6 +456,12 @@ fun main() {
         val elapsed = clock.getElapsedTime()
         overlay.updateBreathing(dt)
         val currentSection = overlay.getCurrentSection()
+
+        // Toggle visibility: blob vs strings
+        val stringsActive = currentSection == "strings"
+        blob.visible = !stringsActive
+        shadow.visible = !stringsActive
+        stringRenderer.setVisible(stringsActive)
 
         // Expire old poke ripples
         recentPokes.removeAll { elapsed - it.time > 1.5 }
@@ -733,6 +754,70 @@ fun main() {
                         }
                     }
                     HandGesture.NONE -> {}
+                }
+            }
+        }
+
+        // === Strings section ===
+        if (stringsActive) {
+            stringSystem.update(dt)
+            stringInteraction.update(dt)
+            stringRenderer.update(elapsed)
+
+            // Mouse interaction for strings
+            val click = inputHandler.consumeClick()
+            if (click != null) {
+                // Pluck on click
+                val worldPt = run {
+                    val nearPt = Vector3(click.first, click.second, 0.0).unproject(camera)
+                    val farPt = Vector3(click.first, click.second, 1.0).unproject(camera)
+                    val dz = farPt.z - nearPt.z
+                    if (kotlin.math.abs(dz) < 0.001) null
+                    else {
+                        val t = -nearPt.z / dz
+                        Vector3(nearPt.x + (farPt.x - nearPt.x) * t, nearPt.y + (farPt.y - nearPt.y) * t, 0.0)
+                    }
+                }
+                if (worldPt != null) {
+                    val nearest = stringSystem.findNearest(worldPt.x, worldPt.y, worldPt.z, maxDist = 1.5)
+                    if (nearest != null) {
+                        stringSystem.pluck(nearest.first, nearest.second, 0.0, 0.15, 0.0)
+                        if (soundEnabled) {
+                            val freq = 330.0
+                            sound.playPluck(freq, 0.8)
+                        }
+                    }
+                }
+            }
+
+            // Drag interaction
+            if (inputHandler.isMouseDown) {
+                val mx = inputHandler.mouseX
+                val my = inputHandler.mouseY
+                if (!stringMouseDown) {
+                    stringInteraction.handleMouseDown(mx, my)
+                    stringMouseDown = true
+                } else {
+                    stringInteraction.handleMouseDrag(mx, my)
+                }
+            } else {
+                if (stringMouseDown) {
+                    stringInteraction.handleMouseUp()
+                    stringMouseDown = false
+                }
+            }
+
+            // Gesture interaction for strings
+            if (gestureEngine.enabled && gestureEngine.handDetected) {
+                val result = stringInteraction.handleGesture(dt)
+                if (result.plucked && soundEnabled) sound.playStrum()
+            }
+
+            // String drone
+            if (soundEnabled) {
+                val energy = stringSystem.getTotalEnergy()
+                if (energy > 0.001) {
+                    sound.updateDrone(energy.coerceAtMost(2.0) / 2.0)
                 }
             }
         }
