@@ -1,5 +1,4 @@
 import audio.SoundEngine
-import audio.VoiceEngine
 import deformation.DeformationController
 import deformation.SpringPhysics
 import deformation.WaveSystem
@@ -234,7 +233,6 @@ fun main() {
 
     // Sound
     val sound = SoundEngine()
-    val voice = VoiceEngine()
     var soundEnabled = true
 
     // Gesture recognition
@@ -399,11 +397,7 @@ fun main() {
         onCycleEquation = {
             mathGraph.cycleSelectedType()
         },
-        onSectionChanged = { section ->
-            when (section) {
-                else -> voice.stop()
-            }
-        }
+        onSectionChanged = { }
     )
     overlayRef = overlay
     overlay.setup()
