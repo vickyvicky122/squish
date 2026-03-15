@@ -185,7 +185,7 @@ class MathGraph(private val scene: Scene) {
 
     fun setVisible(visible: Boolean) {
         graphGroup.visible = visible
-        panelEl?.style?.display = if (visible) "" else "none"
+        panelEl?.style?.display = if (visible) "block" else "none"
         eqDisplayEl?.style?.display = if (visible) "flex" else "none"
     }
 
@@ -354,6 +354,7 @@ class MathGraph(private val scene: Scene) {
             sb.append("""
                 <div class='gp-eq$sel' data-idx='$i'>
                     <span class='gp-dot' style='background:$colorHex'></span>
+                    <span class='gp-num'>${i + 1}.</span>
                     <span class='gp-formula'>${s.equation.displayString()}</span>
                     ${if (surfaces.size > 1) "<button class='gp-rm' data-rm='$i'>×</button>" else ""}
                 </div>
@@ -376,16 +377,20 @@ class MathGraph(private val scene: Scene) {
 
         panel.innerHTML = sb.toString()
 
-        // Wire events via window callbacks (avoids Kotlin name mangling issues)
-        val mg = this
-        val numTemplates = EQUATION_TEMPLATES.size
-        val numSurfaces = surfaces.size
-        js("window._graphSelectSurface = function(i) { mg.selectSurface(i); }")
-        js("window._graphRemoveSurface = function(i) { mg.removeSurface(i); }")
-        js("window._graphAddSurface = function() { mg.addSurface(numSurfaces % numTemplates); }")
-        js("window._graphCycleType = function() { mg.cycleSelectedType(); }")
-        js("window._graphReset = function() { mg.resetSelected(); }")
-        js("window._graphToggleLock = function() { mg.toggleLock(); }")
+        // Wire events via window callbacks using Kotlin lambdas (avoids name mangling)
+        val fnSelect: (Int) -> Unit = { i -> selectSurface(i) }
+        val fnRemove: (Int) -> Unit = { i -> removeSurface(i) }
+        val nextTpl = surfaces.size % EQUATION_TEMPLATES.size
+        val fnAdd: () -> Unit = { addSurface(nextTpl) }
+        val fnCycle: () -> Unit = { cycleSelectedType() }
+        val fnReset: () -> Unit = { resetSelected() }
+        val fnLock: () -> Unit = { toggleLock() }
+        js("window._graphSelectSurface = fnSelect")
+        js("window._graphRemoveSurface = fnRemove")
+        js("window._graphAddSurface = fnAdd")
+        js("window._graphCycleType = fnCycle")
+        js("window._graphReset = fnReset")
+        js("window._graphToggleLock = fnLock")
 
         // Now wire using onclick attributes in JS
         js("""

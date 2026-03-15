@@ -127,7 +127,7 @@ class HtmlOverlay(
                     <div class="gesture-item"><span class="gesture-emoji">✊</span><span class="gesture-name">Fist</span><span class="gesture-desc">Squeeze inward</span></div>
                     <div class="gesture-item"><span class="gesture-emoji">☝️</span><span class="gesture-name">Point</span><span class="gesture-desc">Poke with fingertip</span></div>
                     <div class="gesture-item"><span class="gesture-emoji">🤏</span><span class="gesture-name">Pinch</span><span class="gesture-desc">Dent like clay</span></div>
-                    <div class="gesture-item"><span class="gesture-emoji">👊</span><span class="gesture-name">Fast Fist</span><span class="gesture-desc">Explode!</span></div>
+                    <div class="gesture-item"><span class="gesture-emoji">👏</span><span class="gesture-name">Clap</span><span class="gesture-desc">Explode!</span></div>
                     <div class="gesture-item"><span class="gesture-emoji">🔪</span><span class="gesture-name">Fast Swipe</span><span class="gesture-desc">Slice in half</span></div>
                 </div>
                 <div class="gesture-guide-note">Just move your hand near the blob. Your fingers automatically push into the surface.</div>
@@ -139,7 +139,7 @@ class HtmlOverlay(
         okayPopup = (document.createElement("div") as HTMLDivElement).apply {
             id = "okayPopup"
             className = "okay-popup"
-            textContent = "IT WILL BE OKAY"
+            textContent = "chill dawg"
             style.display = "none"
         }
         document.body?.appendChild(okayPopup!!)

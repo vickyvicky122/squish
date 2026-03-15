@@ -464,7 +464,7 @@ fun main() {
         val dt = clock.getDelta()
         val elapsed = clock.getElapsedTime()
         overlay.updateBreathing(dt)
-        overlay.updateOkayPopup(dt)
+        // (okay popup removed)
         val currentSection = overlay.getCurrentSection()
 
         // Toggle visibility: blob vs graph
@@ -671,7 +671,13 @@ fun main() {
                         if (gestureEngine.shouldPunch()) {
                             deformController.applyExplode()
                             waveSystem.excite(0.5, 0.8, 0.3, 3.0)
-                            // explode sound removed
+                        }
+                    }
+                    HandGesture.CLAP -> {
+                        if (gestureEngine.shouldClap()) {
+                            deformController.applyExplode()
+                            waveSystem.excite(0.8, 0.8, 0.8, 4.0)
+                            if (soundEnabled) sound.playExplode()
                         }
                     }
                     HandGesture.PINCH -> {
@@ -768,15 +774,12 @@ fun main() {
                             }
                         }
                     }
-                    HandGesture.MIDDLE_FINGER -> {}
+                    HandGesture.MIDDLE_FINGER -> {} // unused
                     HandGesture.NONE -> {}
                 }
             }
 
-            // Middle finger works in any section
-            if (gestureEngine.currentGesture == HandGesture.MIDDLE_FINGER) {
-                overlay.showOkayPopup()
-            }
+            // (middle finger gesture removed)
         }
 
         // === 3D Graph section ===

@@ -21,8 +21,9 @@ enum class HandGesture(val label: String) {
     SLAP("Slap!"),
     SLICE("Slice!"),
     KNEAD("Knead"),
+    CLAP("Clap!"),
     TWO_HAND_RESIZE("Resize"),
-    MIDDLE_FINGER("IT WILL BE OKAY")
+    MIDDLE_FINGER("—")
 }
 
 /**
@@ -140,12 +141,16 @@ class GestureEngine {
     private var swipeStartX = 0.5
     private var swipeAccumX = 0.0
     private var swipeFrames = 0
-    private val swipeMaxFrames = 15  // ~0.25s at 60fps to complete a swipe
+    private val swipeMaxFrames = 20  // ~0.33s at 60fps to complete a swipe
 
     // Gesture smoothing
     private var rawGesture = HandGesture.NONE
     private var gestureFrames = 0
     private val confirmFrames = 4  // filters single-frame gesture flickering (~67ms at 60fps)
+
+    // Clap detection — two hands closing fast then hitting minimum distance
+    private var clapCooldown = 0.0
+    private var clapClosingSpeed = 0.0  // how fast hands are coming together (positive = closing)
 
     // One-shot action debounce
     private var resetCooldown = 0.0
@@ -202,6 +207,7 @@ class GestureEngine {
         punchCooldown = (punchCooldown - dt).coerceAtLeast(0.0)
         slapCooldown = (slapCooldown - dt).coerceAtLeast(0.0)
         sliceCooldown = (sliceCooldown - dt).coerceAtLeast(0.0)
+        clapCooldown = (clapCooldown - dt).coerceAtLeast(0.0)
         pullCooldown = (pullCooldown - dt).coerceAtLeast(0.0)
 
         val detected: Boolean = js("window._handDetected === true") as Boolean
@@ -324,7 +330,7 @@ class GestureEngine {
         // ~0.20 = fully open, ~0.04 = pinched tight
         pinchAmount = (1.0 - ((pinchDist - 0.04) / 0.16).coerceIn(0.0, 1.0))
 
-        // Two-hand resize tracking
+        // Two-hand tracking (resize + clap detection)
         if (hand2Detected && hand2_3D != null) {
             prevTwoHandDistance = twoHandDistance
             val h1 = hand3D!!
@@ -333,8 +339,19 @@ class GestureEngine {
             twoHandResizeDelta = twoHandDistance - prevTwoHandDistance
             twoHandCenterX = (h1.palmCenterX + h2.palmCenterX) / 2.0
             twoHandCenterY = (h1.palmCenterY + h2.palmCenterY) / 2.0
+
+            // Clap detection: hands closing fast (negative delta = getting closer)
+            // Smooth the closing speed to avoid single-frame spikes
+            clapClosingSpeed = clapClosingSpeed * 0.6 + (-twoHandResizeDelta) * 0.4
+            // Clap triggers when: hands are close AND were closing fast
+            if (twoHandDistance < 0.12 && clapClosingSpeed > 0.008 && clapCooldown <= 0.0) {
+                currentGesture = HandGesture.CLAP
+                clapCooldown = 2.0
+                clapClosingSpeed = 0.0
+            }
         } else {
             twoHandResizeDelta = 0.0
+            clapClosingSpeed = 0.0
         }
 
         // Knead tracking (continuous squeeze-release cycling)
@@ -362,10 +379,11 @@ class GestureEngine {
         }
 
         // Upgrade fist → punch when hand is moving fast
-        if (currentGesture == HandGesture.CLOSE) {
-            if (handVelocity > 0.025) {
-                currentGesture = HandGesture.PUNCH
-            }
+        // Also trigger from any gesture with high grip + velocity (more forgiving)
+        if (currentGesture == HandGesture.CLOSE && handVelocity > 0.018) {
+            currentGesture = HandGesture.PUNCH
+        } else if (gripAmount > 0.6 && handVelocity > 0.03) {
+            currentGesture = HandGesture.PUNCH
         }
 
         // Track swipes for slice detection:
@@ -378,7 +396,7 @@ class GestureEngine {
 
             // Check if we've swiped far enough, fast enough, through the center
             val handNearCenter = handX > 0.25 && handX < 0.75 && handY > 0.2 && handY < 0.8
-            if (swipeAccumX > 0.25 && swipeFrames <= swipeMaxFrames && handNearCenter && sliceCooldown <= 0.0) {
+            if (swipeAccumX > 0.18 && swipeFrames <= swipeMaxFrames && handNearCenter && sliceCooldown <= 0.0) {
                 currentGesture = HandGesture.SLICE
                 swipeAccumX = 0.0
                 swipeFrames = 0
@@ -528,6 +546,10 @@ class GestureEngine {
         return false
     }
 
+    fun shouldClap(): Boolean {
+        return currentGesture == HandGesture.CLAP
+    }
+
     fun shouldPull(): Boolean {
         if (currentGesture == HandGesture.PULL && pullCooldown <= 0.0) {
             pullCooldown = 0.3
@@ -605,8 +627,7 @@ class GestureEngine {
             okDist < 0.06 && middleUp && (ringUp || pinkyUp) -> HandGesture.OK
             // Spread / jazz hands: ALL 5 fingers including thumb AND spread apart → explode
             thumbUp && indexUp && middleUp && ringUp && pinkyUp && areFingersSpread(lm) -> HandGesture.SPREAD
-            // Middle finger: only middle extended
-            !indexUp && middleUp && !ringUp && !pinkyUp -> HandGesture.MIDDLE_FINGER
+            // (middle-only gesture removed)
             // Horns / rock sign: index + pinky only → scramble
             indexUp && !middleUp && !ringUp && pinkyUp -> HandGesture.HORNS
             // Victory: index + middle extended, ring + pinky closed
