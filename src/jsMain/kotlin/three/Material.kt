@@ -3,6 +3,16 @@
 
 package three
 
+external class MeshBasicMaterial(params: dynamic = definedExternally) {
+    var color: Color
+    var wireframe: Boolean
+    var transparent: Boolean
+    var opacity: Double
+    var side: Int
+}
+
+external val DoubleSide: Int
+
 external class MeshStandardMaterial(params: dynamic = definedExternally) {
     var color: Color
     var roughness: Double

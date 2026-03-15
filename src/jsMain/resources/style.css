@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
 
 * {
     margin: 0;
@@ -528,6 +528,28 @@ body.scale-xl .calm-subtext { font-size: 15px; }
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ======= Global gesture toggle button ======= */
+.gesture-global-btn {
+    position: fixed;
+    top: 20px;
+    right: 100px;
+    z-index: 25;
+}
+
+/* ======= Breathing overlay (floats over chill blob) ======= */
+.breath-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    z-index: 8;
+    pointer-events: none;
+}
+
 /* ======= Micro-interactions & polish ======= */
 ::selection {
     background: var(--accent);
@@ -541,34 +563,197 @@ body.scale-xl .calm-subtext { font-size: 15px; }
     border-radius: 8px;
 }
 
-/* ======= Strings section ======= */
+/* ======= Equation top bar ======= */
+.eq-top-bar {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 15;
+    background: rgba(18, 18, 24, 0.75);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+}
+.eq-formula {
+    font-size: 17px;
+    color: rgba(120, 170, 255, 0.9);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+.eq-inputs {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+.eq-inputs label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: rgba(180, 180, 210, 0.5);
+    font-size: 12px;
+}
+.eq-inputs input {
+    width: 56px;
+    padding: 4px 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    color: rgba(200, 210, 240, 0.9);
+    font-family: inherit;
+    font-size: 12px;
+    text-align: center;
+}
+.eq-inputs input:focus {
+    outline: none;
+    border-color: rgba(100, 150, 255, 0.4);
+    background: rgba(255,255,255,0.1);
+}
+
+/* ======= Graph panel — left sidebar ======= */
+.graph-panel {
+    position: fixed;
+    top: 80px;
+    left: 16px;
+    width: 240px;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    z-index: 15;
+    background: rgba(18, 18, 24, 0.75);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    color: rgba(220, 220, 230, 0.85);
+    display: none;
+}
+.gp-header {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(180, 180, 200, 0.4);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.gp-eq {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+}
+.gp-eq:hover { background: rgba(255,255,255,0.04); }
+.gp-eq-selected {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.1);
+}
+.gp-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.gp-formula {
+    flex: 1;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.gp-rm {
+    background: none;
+    border: none;
+    color: rgba(200, 100, 100, 0.5);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+.gp-rm:hover { color: rgba(255, 100, 100, 0.9); }
+.gp-coeffs {
+    display: flex;
+    gap: 6px;
+    margin: 10px 0 8px;
+}
+.gp-coeffs label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: rgba(180, 180, 200, 0.5);
+    font-size: 11px;
+}
+.gp-coeffs input {
+    width: 52px;
+    padding: 3px 4px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    color: rgba(220, 220, 230, 0.9);
+    font-family: inherit;
+    font-size: 11px;
+    text-align: center;
+}
+.gp-coeffs input:focus {
+    outline: none;
+    border-color: rgba(100, 140, 220, 0.4);
+}
+.gp-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+.gp-btn {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: rgba(200, 200, 220, 0.6);
+    padding: 5px 0;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: lowercase;
+}
+.gp-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: rgba(220, 220, 240, 0.9);
+}
+.gp-hint {
+    margin-top: 10px;
+    font-size: 9px;
+    color: rgba(180, 180, 200, 0.25);
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Maths section bottom controls */
 .strings-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-    padding: 10px;
+    gap: 10px;
+    padding: 8px;
 }
-
-.strings-text {
-    color: var(--text-quote);
-    font-size: 20px;
-    font-weight: 300;
-    letter-spacing: 0.3px;
-}
-
 .strings-subtext {
     color: var(--text-hint);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 400;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
 }
-
 .strings-controls {
     display: flex;
     gap: 8px;
     justify-content: center;
 }
-
-body.scale-large .strings-text { font-size: 24px; }
-body.scale-xl .strings-text { font-size: 28px; }

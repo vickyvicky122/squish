@@ -7,9 +7,7 @@ import gesture.GestureEngine
 import gesture.HandGesture
 import kotlinx.browser.document
 import kotlinx.browser.window
-import strings.StringSystem
-import strings.StringRenderer
-import strings.StringInteraction
+import graph.MathGraph
 import org.khronos.webgl.Float32Array
 import org.khronos.webgl.get
 import org.khronos.webgl.set
@@ -243,17 +241,15 @@ fun main() {
     val gestureEngine = GestureEngine()
     var gesturePokeCooldown = 0.0
 
-    // Strings system
-    val stringSystem = StringSystem(numStrings = 1, pointsPerString = 128)
-    val stringRenderer = StringRenderer(scene, stringSystem)
-    stringRenderer.setup()
-    var stringMouseDown = false
+    // 3D Math graph
+    val mathGraph = graph.MathGraph(scene)
+    mathGraph.setup()
 
     // Input
     val inputHandler = InputHandler()
     inputHandler.setup()
 
-    val stringInteraction = StringInteraction(stringSystem, camera, inputHandler, gestureEngine)
+    // (mouse-based coefficient editing removed — use input fields or gestures)
 
     // === State ===
     var currentColorIndex = 0
@@ -392,13 +388,15 @@ fun main() {
             overlayRef?.updateGestureLabel(on)
         },
         onResetStrings = {
-            stringSystem.reset()
+            mathGraph.resetSelected()
             if (soundEnabled) sound.playReset()
+        },
+        onCycleEquation = {
+            mathGraph.cycleSelectedType()
+            if (soundEnabled) sound.playClick()
         },
         onSectionChanged = { section ->
             when (section) {
-                "motivation" -> voice.playMotivation()
-                "calm" -> voice.playMeditation()
                 else -> voice.stop()
             }
         }
@@ -466,11 +464,11 @@ fun main() {
         overlay.updateBreathing(dt)
         val currentSection = overlay.getCurrentSection()
 
-        // Toggle visibility: blob vs strings
-        val stringsActive = currentSection == "strings"
-        blob.visible = !stringsActive
-        shadow.visible = !stringsActive
-        stringRenderer.setVisible(stringsActive)
+        // Toggle visibility: blob vs graph
+        val graphActive = currentSection == "strings"
+        blob.visible = !graphActive
+        shadow.visible = !graphActive
+        mathGraph.setVisible(graphActive)
 
         // Expire old poke ripples
         recentPokes.removeAll { elapsed - it.time > 1.5 }
@@ -483,7 +481,7 @@ fun main() {
         )
 
         // --- Quote system ---
-        if (currentSection == "deform" || currentSection == "calm") {
+        if (currentSection == "deform") {
             quoteTimer += dt
             val qt = inputHandler.timeSinceLastInteraction()
             val idle = qt > 5.0
@@ -767,61 +765,60 @@ fun main() {
             }
         }
 
-        // === Strings section ===
-        if (stringsActive) {
-            stringSystem.update(dt)
-            stringInteraction.update(dt)
-            stringRenderer.update(elapsed)
+        // === 3D Graph section ===
+        if (graphActive) {
+            mathGraph.update(elapsed)
 
-            // Mouse interaction for strings
-            val click = inputHandler.consumeClick()
-            if (click != null) {
-                // Pluck on click
-                val worldPt = run {
-                    val nearPt = Vector3(click.first, click.second, 0.0).unproject(camera)
-                    val farPt = Vector3(click.first, click.second, 1.0).unproject(camera)
-                    val dz = farPt.z - nearPt.z
-                    if (kotlin.math.abs(dz) < 0.001) null
-                    else {
-                        val t = -nearPt.z / dz
-                        Vector3(nearPt.x + (farPt.x - nearPt.x) * t, nearPt.y + (farPt.y - nearPt.y) * t, 0.0)
-                    }
+            // Keyboard: cycle equation with E, reset with R
+            if ("e" in inputHandler.pressedKeys || "E" in inputHandler.pressedKeys) {
+                mathGraph.cycleSelectedType()
+                inputHandler.pressedKeys.remove("e"); inputHandler.pressedKeys.remove("E")
+            }
+            if ("r" in inputHandler.pressedKeys || "R" in inputHandler.pressedKeys) {
+                mathGraph.resetSelected()
+                inputHandler.pressedKeys.remove("r"); inputHandler.pressedKeys.remove("R")
+            }
+
+            // Arrow keys: up/down → c, left/right → translate graph
+            // (only when no input field is focused)
+            val inputFocused: Boolean = js("document.activeElement && document.activeElement.tagName === 'INPUT'") as Boolean
+            if (!inputFocused) {
+                if ("ArrowUp" in inputHandler.pressedKeys) {
+                    mathGraph.adjustC(dt * 0.8)
                 }
-                if (worldPt != null) {
-                    val nearest = stringSystem.findNearest(worldPt.x, worldPt.y, worldPt.z, maxDist = 1.5)
-                    if (nearest != null) {
-                        stringSystem.pluck(nearest.first, nearest.second, 0.0, 0.15, 0.0)
-                        if (soundEnabled) {
-                            val freq = 330.0
-                            sound.playPluck(freq, 0.8)
-                        }
-                    }
+                if ("ArrowDown" in inputHandler.pressedKeys) {
+                    mathGraph.adjustC(-dt * 0.8)
+                }
+                if ("ArrowLeft" in inputHandler.pressedKeys) {
+                    mathGraph.translate(-dt * 2.0, 0.0)
+                }
+                if ("ArrowRight" in inputHandler.pressedKeys) {
+                    mathGraph.translate(dt * 2.0, 0.0)
                 }
             }
 
-            // Drag interaction
-            if (inputHandler.isMouseDown) {
-                val mx = inputHandler.mouseX
-                val my = inputHandler.mouseY
-                if (!stringMouseDown) {
-                    stringInteraction.handleMouseDown(mx, my)
-                    stringMouseDown = true
+            // Gesture interaction for maths tab
+            if (gestureEngine.enabled && gestureEngine.handDetected) {
+                if (gestureEngine.pinchAmount > 0.7) {
+                    // Pinching → adjust coefficients a, b
+                    mathGraph.adjustAB(
+                        -gestureEngine.handDeltaX,
+                        gestureEngine.handDeltaY
+                    )
                 } else {
-                    stringInteraction.handleMouseDrag(mx, my)
+                    // Not pinching → hand position gently orbits the camera
+                    if (mathGraph.isGrabbing) mathGraph.endGrab()
+                    val handCenterX = gestureEngine.handX - 0.5  // -0.5 to 0.5
+                    val handCenterY = gestureEngine.handY - 0.5
+                    // Smoothly orbit: hand left = rotate left, hand up = tilt up
+                    mathGraph.rotate(
+                        -handCenterY * dt * 0.8,
+                        handCenterX * dt * 0.8
+                    )
                 }
             } else {
-                if (stringMouseDown) {
-                    stringInteraction.handleMouseUp()
-                    stringMouseDown = false
-                }
+                if (mathGraph.isGrabbing) mathGraph.endGrab()
             }
-
-            // Gesture interaction for strings
-            if (gestureEngine.enabled && gestureEngine.handDetected) {
-                val result = stringInteraction.handleGesture(dt)
-                if (result.plucked && soundEnabled) sound.playStrum()
-            }
-
         }
 
         // Global shortcuts
@@ -836,14 +833,23 @@ fun main() {
             inputHandler.pressedKeys.remove("t"); inputHandler.pressedKeys.remove("T")
         }
 
-        // Rotation (mouse + gesture)
-        // When hand is detected, freeze rotation so the ball is easy to sculpt
+        // Rotation (mouse drag + inertia) — applies to whichever model is active
         val handActive = gestureEngine.enabled && gestureEngine.handDetected
         val (rotX, rotY) = inputHandler.updateRotationInertia(dt)
-        if (rotX != 0.0 || rotY != 0.0) {
-            blob.rotation.x += rotX; blob.rotation.y += rotY
-        } else if (!handActive && !inputHandler.isMouseDown) {
-            blob.rotation.y += if (currentSection == "calm") 0.0006 else 0.0015
+        if (graphActive) {
+            // Graph rotation
+            if (rotX != 0.0 || rotY != 0.0) {
+                mathGraph.rotate(rotX, rotY)
+            } else if (!inputHandler.isMouseDown) {
+                mathGraph.rotate(0.0, 0.0003)  // gentle idle spin
+            }
+        } else {
+            // Blob rotation
+            if (rotX != 0.0 || rotY != 0.0) {
+                blob.rotation.x += rotX; blob.rotation.y += rotY
+            } else if (!handActive && !inputHandler.isMouseDown) {
+                blob.rotation.y += 0.0015
+            }
         }
 
         // Idle breathing — subtle scale pulse, always alive
@@ -853,7 +859,7 @@ fun main() {
         // Idle floating (gesture activity counts as interaction)
         val idleTime = inputHandler.timeSinceLastInteraction()
         val isIdle = idleTime > 5.0 && !(gestureEngine.enabled && gestureEngine.handDetected)
-        if (isIdle || currentSection == "calm") {
+        if (isIdle) {
             blob.position.y = sin(elapsed * 0.8) * 0.04
         } else {
             blob.position.y += (0.0 - blob.position.y) * 0.05
