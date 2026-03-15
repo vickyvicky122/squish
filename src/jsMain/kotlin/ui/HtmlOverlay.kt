@@ -13,18 +13,16 @@ class HtmlOverlay(
     private val onCycleStyle: () -> Unit = {},
     private val onToggleGesture: () -> Unit = {},
     private val onResetStrings: () -> Unit = {},
+    private val onCycleEquation: () -> Unit = {},
     private val onSectionChanged: (String) -> Unit = {}
 ) {
     private var quoteEl: HTMLElement? = null
     private var soundBtn: HTMLElement? = null
-    private var currentSection = "deform"
+    private var currentSection = "strings"
 
-    // Section elements
-    private var sectionDeform: HTMLElement? = null
-    private var sectionFocus: HTMLElement? = null
-    private var sectionMotivation: HTMLElement? = null
-    private var sectionCalm: HTMLElement? = null
-    private var sectionStrings: HTMLElement? = null
+    // Section elements — two main modes
+    private var sectionChill: HTMLElement? = null
+    private var sectionMaths: HTMLElement? = null
 
     // Breathing state
     private var breathingActive = false
@@ -33,10 +31,6 @@ class HtmlOverlay(
     private var breathingCircle: HTMLElement? = null
     private var breathingLabel: HTMLElement? = null
     private var breathingBtn: HTMLElement? = null
-
-    // Motivation
-    private var motivationQuoteEl: HTMLElement? = null
-    private var motivationIndex = 0
 
     private val quotes = arrayOf(
         "Take a breath. You're doing well.",
@@ -64,17 +58,17 @@ class HtmlOverlay(
     private var quoteVisible = false
 
     fun setup() {
-        // -- Top quote (shows on deform/home) --
+        // -- Top quote --
         quoteEl = (document.createElement("div") as HTMLDivElement).apply {
             id = "quote"
             textContent = quotes[0]
         }
         document.body?.appendChild(quoteEl!!)
 
-        // -- Section: Deform --
-        sectionDeform = createSection("section-deform", """
+        // -- Section: Chill (blob + breathing) --
+        sectionChill = createSection("section-chill", """
             <div class="section-hint">
-                drag to rotate · scroll to zoom · keys to deform
+                drag to rotate · scroll to zoom · squish with your hands
             </div>
             <div class="deform-controls">
                 <button class="pill-btn" id="btnReset">Reset</button>
@@ -82,13 +76,13 @@ class HtmlOverlay(
                 <button class="pill-btn" id="btnTheme">Theme</button>
                 <button class="pill-btn" id="btnColor">Color</button>
                 <button class="pill-btn" id="btnStyle">Calm Jelly</button>
-                <button class="pill-btn" id="btnScale">Normal</button>
-                <button class="pill-btn" id="btnGesture">Gesture ON</button>
+                <button class="pill-btn" id="btnBreath">Breathe</button>
             </div>
         """.trimIndent())
-        document.body?.appendChild(sectionDeform!!)
+        sectionChill?.style?.display = "none"
+        document.body?.appendChild(sectionChill!!)
 
-        // Wire deform buttons
+        // Wire chill buttons
         document.getElementById("btnReset")?.addEventListener("click", { onReset() })
         soundBtn = document.getElementById("btnSound") as? HTMLElement
         soundBtn?.addEventListener("click", { onToggleSound() })
@@ -97,90 +91,53 @@ class HtmlOverlay(
             document.dispatchEvent(js("new KeyboardEvent('keydown', {key: 'c'})"))
         })
         document.getElementById("btnStyle")?.addEventListener("click", { onCycleStyle() })
-        document.getElementById("btnScale")?.addEventListener("click", { onCycleScale() })
-        document.getElementById("btnGesture")?.addEventListener("click", { onToggleGesture() })
-
-        // -- Section: Focus (Breathing) --
-        sectionFocus = createSection("section-focus", """
-            <div class="focus-content">
-                <div class="breathing-ring" id="breathRing">
-                    <div class="breathing-circle" id="breathCircle"></div>
-                </div>
-                <div class="breathing-label" id="breathLabel">Ready</div>
-                <button class="pill-btn breath-btn" id="btnBreath">Start Breathing</button>
-                <div class="focus-desc">4 seconds inhale · 4 seconds hold · 4 seconds exhale</div>
-            </div>
-        """.trimIndent())
-        sectionFocus?.style?.display = "none"
-        document.body?.appendChild(sectionFocus!!)
-
-        breathingCircle = document.getElementById("breathCircle") as? HTMLElement
-        breathingLabel = document.getElementById("breathLabel") as? HTMLElement
         breathingBtn = document.getElementById("btnBreath") as? HTMLElement
         breathingBtn?.addEventListener("click", { toggleBreathing() })
 
-        // -- Section: Motivation --
-        sectionMotivation = createSection("section-motivation", """
-            <div class="motivation-content">
-                <div class="motivation-quote" id="motivQuote">"Small progress is still progress."</div>
-                <div class="motivation-actions">
-                    <button class="pill-btn" id="btnNextQuote">Next Quote</button>
+        // -- Global gesture toggle (always visible, top-right) --
+        val gestureBtn = (document.createElement("button") as HTMLElement).apply {
+            id = "btnGesture"
+            className = "pill-btn gesture-global-btn"
+            textContent = "Gesture ON"
+        }
+        document.body?.appendChild(gestureBtn)
+        gestureBtn.addEventListener("click", { onToggleGesture() })
+
+        // -- Breathing overlay (hidden, centered, floats over blob) --
+        val breathOverlay = (document.createElement("div") as HTMLDivElement).apply {
+            id = "breathOverlay"
+            className = "breath-overlay"
+            innerHTML = """
+                <div class="breathing-ring" id="breathRing">
+                    <div class="breathing-circle" id="breathCircle"></div>
                 </div>
-            </div>
-        """.trimIndent())
-        sectionMotivation?.style?.display = "none"
-        document.body?.appendChild(sectionMotivation!!)
+                <div class="breathing-label" id="breathLabel"></div>
+            """.trimIndent()
+            style.display = "none"
+        }
+        document.body?.appendChild(breathOverlay)
+        breathingCircle = document.getElementById("breathCircle") as? HTMLElement
+        breathingLabel = document.getElementById("breathLabel") as? HTMLElement
 
-        motivationQuoteEl = document.getElementById("motivQuote") as? HTMLElement
-        document.getElementById("btnNextQuote")?.addEventListener("click", { nextMotivationQuote() })
-
-        // -- Section: Calm --
-        sectionCalm = createSection("section-calm", """
-            <div class="calm-content">
-                <div class="calm-text">Let your mind drift.</div>
-                <div class="calm-subtext">The blob floats gently. Just watch.</div>
-            </div>
-        """.trimIndent())
-        sectionCalm?.style?.display = "none"
-        document.body?.appendChild(sectionCalm!!)
-
-        // -- Section: Strings --
-        sectionStrings = createSection("section-strings", """
+        // -- Section: Maths (3D graph — sidebar handles UI) --
+        sectionMaths = createSection("section-maths", """
             <div class="strings-content">
-                <div class="strings-text">Pull and release.</div>
-                <div class="strings-subtext">Click &amp; drag to deform the graph · Space to pluck · R to reset</div>
-                <div class="strings-controls">
-                    <button class="pill-btn" id="btnStringsReset">Reset</button>
-                </div>
+                <div class="strings-subtext">drag to rotate · scroll to shift · pinch to tweak</div>
             </div>
         """.trimIndent())
-        sectionStrings?.style?.display = "none"
-        document.body?.appendChild(sectionStrings!!)
-        document.getElementById("btnStringsReset")?.addEventListener("click", { onResetStrings() })
+        document.body?.appendChild(sectionMaths!!)
 
-        // -- Bottom Navigation --
+        // -- Bottom Navigation — two tabs --
         val nav = (document.createElement("nav") as HTMLElement).apply {
             id = "nav"
             innerHTML = """
-                <button class="nav-btn active" data-section="deform">
+                <button class="nav-btn" data-section="deform">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8c-2 0-3.5 1.5-3.5 4s1.5 4 3.5 4 3.5-1.5 3.5-4-1.5-4-3.5-4z"/></svg>
-                    <span>Deform</span>
+                    <span>Chill</span>
                 </button>
-                <button class="nav-btn" data-section="strings">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="4" x2="4" y2="20"/><line x1="20" y1="4" x2="20" y2="20"/><path d="M4 8 Q12 12 20 8"/><path d="M4 14 Q12 18 20 14"/></svg>
-                    <span>Strings</span>
-                </button>
-                <button class="nav-btn" data-section="focus">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    <span>Focus</span>
-                </button>
-                <button class="nav-btn" data-section="motivation">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                    <span>Motivation</span>
-                </button>
-                <button class="nav-btn" data-section="calm">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 110-14h.5"/><path d="M17.5 19a4.5 4.5 0 100-9h-1.8"/></svg>
-                    <span>Calm</span>
+                <button class="nav-btn active" data-section="strings">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 L8 4 L12 16 L16 8 L20 12"/><line x1="2" y1="20" x2="22" y2="20" opacity="0.3"/></svg>
+                    <span>Maths</span>
                 </button>
             """.trimIndent()
         }
@@ -194,7 +151,7 @@ class HtmlOverlay(
             })
         }
 
-        showQuote()
+        // Don't show quote on startup (Maths is default)
     }
 
     private fun createSection(id: String, html: String): HTMLElement {
@@ -207,11 +164,9 @@ class HtmlOverlay(
 
     fun switchSection(name: String) {
         currentSection = name
-        sectionDeform?.style?.display = if (name == "deform") "" else "none"
-        sectionFocus?.style?.display = if (name == "focus") "" else "none"
-        sectionMotivation?.style?.display = if (name == "motivation") "" else "none"
-        sectionCalm?.style?.display = if (name == "calm") "" else "none"
-        sectionStrings?.style?.display = if (name == "strings") "" else "none"
+        // "deform" = chill mode, "strings" = maths mode
+        sectionChill?.style?.display = if (name == "deform") "" else "none"
+        sectionMaths?.style?.display = if (name == "strings") "" else "none"
 
         // Update nav active state
         document.querySelectorAll(".nav-btn").asDynamic().forEach { btn: dynamic ->
@@ -223,15 +178,11 @@ class HtmlOverlay(
             }
         }
 
-        // Show/hide top quote
-        if (name == "deform" || name == "calm") {
-            quoteEl?.style?.display = ""
-        } else {
-            quoteEl?.style?.display = "none"
-        }
+        // Quote shows on chill mode
+        quoteEl?.style?.display = if (name == "deform") "" else "none"
 
-        // Stop breathing when leaving focus
-        if (name != "focus" && breathingActive) {
+        // Stop breathing when leaving chill
+        if (name != "deform" && breathingActive) {
             stopBreathing()
         }
 
@@ -282,20 +233,7 @@ class HtmlOverlay(
         }
     }
 
-    // -- Motivation --
-    private fun nextMotivationQuote() {
-        motivationIndex = (motivationIndex + 1) % quotes.size
-        motivationQuoteEl?.let { el ->
-            el.classList.remove("fade-in")
-            // Force reflow then re-add
-            window.requestAnimationFrame {
-                el.textContent = "\"${quotes[motivationIndex]}\""
-                el.classList.add("fade-in")
-            }
-        }
-    }
-
-    // -- Breathing --
+    // -- Breathing (integrated into chill mode) --
     private fun toggleBreathing() {
         if (breathingActive) stopBreathing() else startBreathing()
     }
@@ -304,18 +242,20 @@ class HtmlOverlay(
         breathingActive = true
         breathingPhase = "inhale"
         breathingTimer = 0.0
-        breathingBtn?.textContent = "Stop"
+        breathingBtn?.textContent = "Stop Breathing"
         breathingCircle?.classList?.add("inhale")
         breathingLabel?.textContent = "Breathe in..."
+        (document.getElementById("breathOverlay") as? HTMLElement)?.style?.display = ""
     }
 
     private fun stopBreathing() {
         breathingActive = false
         breathingPhase = "idle"
         breathingTimer = 0.0
-        breathingBtn?.textContent = "Start Breathing"
+        breathingBtn?.textContent = "Breathe"
         breathingCircle?.classList?.remove("inhale", "hold", "exhale")
-        breathingLabel?.textContent = "Ready"
+        breathingLabel?.textContent = ""
+        (document.getElementById("breathOverlay") as? HTMLElement)?.style?.display = "none"
     }
 
     fun updateBreathing(dt: Double) {

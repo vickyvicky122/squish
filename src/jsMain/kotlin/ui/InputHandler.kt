@@ -67,8 +67,9 @@ class InputHandler {
             if (isMouseDown) {
                 val dx = e.clientX.toDouble() - lastMouseX
                 val dy = e.clientY.toDouble() - lastMouseY
-                rotVelX = dy * 0.005
-                rotVelY = dx * 0.005
+                // Smooth rotation with responsive feel
+                rotVelX = rotVelX * 0.5 + dy * 0.006 * 0.5
+                rotVelY = rotVelY * 0.5 + dx * 0.006 * 0.5
                 lastMouseX = e.clientX.toDouble()
                 lastMouseY = e.clientY.toDouble()
                 wasDragging = true
@@ -98,7 +99,7 @@ class InputHandler {
     fun updateRotationInertia(dt: Double): Pair<Double, Double> {
         if (!isMouseDown) {
             // Smooth exponential decay
-            val decay = 0.95
+            val decay = 0.96  // smooth with good carry
             rotVelX *= decay
             rotVelY *= decay
             // Kill tiny residual

@@ -1,19 +1,18 @@
-# SoftSpace — Your Calm Workspace Companion
+# squish.space
+
+3D maths you can touch. A hands-on graphing tool and stress toy built for people who think best when they're fidgeting.
 
 **Live demo: [sotonhack.vercel.app](https://sotonhack.vercel.app)**
 
-A browser-based anti-stress experience featuring an interactive 3D blob you can poke, squeeze, twist, and explode — with hand gesture recognition and layered ASMR sounds. Built for SotonHack.
+Built at SotonHack.
 
-## What It Does
+---
 
-A squishy 3D blob floats on screen. You deform it with keyboard, mouse, touch, or your webcam hand gestures. It springs back like foam rubber with satisfying sounds. Four modes keep you relaxed:
+## What is this
 
-- **Deform** — Poke, stretch, twist, squeeze, explode, scramble, or punch the blob
-- **Focus** — Guided 4-4-4 breathing exercise with animated ring
-- **Motivation** — Rotating motivational quotes
-- **Calm** — Passive observation with gentle auto-rotation
+Two modes, one app:
 
-## Stack
+**Maths** — A 3D equation grapher. Plot surfaces like `z = ax² + by²`, rotate them in 3D, and tweak the coefficients with your hands via webcam. Add multiple equations, see them intersect, type exact values or just pinch and drag. Think Desmos, but you can reach in.
 
 | Layer | Technology |
 |-------|-----------|
@@ -25,18 +24,35 @@ A squishy 3D blob floats on screen. You deform it with keyboard, mouse, touch, o
 | Build | **Gradle 8.5** + Kotlin/JS webpack bundling |
 | Styling | Glassmorphism CSS with backdrop filters, 3 themes, 3 scale modes |
 
-No backend. No auth. Single-page app, fully client-side.
+Hand tracking is via MediaPipe — no gloves, no controllers, just your webcam and your fingers.
 
 ## Controls
 
-### Keyboard
-| Key | Action |
-|-----|--------|
-| W / S | Stretch / compress vertically |
-| A / D | Widen / narrow horizontally |
-| Q / E | Twist left / right |
-| F | Squeeze inward |
-| Space | Radial pulse |
+### Maths tab
+
+| Input | What it does |
+|-------|-------------|
+| Mouse drag | Rotate the 3D view |
+| Scroll | Zoom |
+| ← → arrows | Pan left/right |
+| ↑ ↓ arrows | Shift surface up/down (coefficient c) |
+| E | Cycle equation type |
+| R | Reset coefficients |
+| a/b/c inputs | Type exact coefficient values |
+| Pinch gesture | Drag to adjust a and b |
+| Open hand | Gently orbit the view |
+
+Equation types: Paraboloid, Saddle, Wave, Ripple, Gaussian, Plane.
+
+### Chill tab
+
+| Input | What it does |
+|-------|-------------|
+| Click | Poke the blob |
+| Drag | Rotate |
+| Scroll | Zoom |
+| W/S/A/D/Q/E/F | Stretch, squeeze, twist |
+| Space | Pulse |
 | R | Reset shape |
 | C | Cycle color (9 palettes) |
 | M | Toggle sound |
@@ -74,44 +90,64 @@ No backend. No auth. Single-page app, fully client-side.
 - **Cloud Foam** — Fluffy, pillowy, diffuse glow
 
 ## Project Structure
+| C | Cycle color |
+| Hands near blob | Fingers push into the surface |
+| Fast swipe | Slice the blob in two |
+| Fast fist | Explode |
+
+## How it works
+
+| Component | Tech |
+|-----------|------|
+| Language | Kotlin/JS (IR backend, Kotlin Multiplatform) |
+| 3D | Three.js r160, custom `@JsModule` external declarations |
+| Physics | Per-vertex spring simulation with volume preservation and Laplacian smoothing |
+| Hand tracking | MediaPipe Hands (browser, webcam) — landmarks to proximity-based contact |
+| Audio | Web Audio API — procedural synthesis, no samples |
+| Build | Gradle 8.5, webpack |
+| UI | Two tabs, dark sidebar panel, monospace coefficient inputs |
+
+No backend. No accounts. Runs entirely in your browser.
+
+## Project structure
 
 ```
-src/jsMain/
-├── kotlin/
-│   ├── Main.kt                    # Entry point, scene, animation loop
-│   ├── three/                     # Three.js external declarations
-│   │   ├── Core.kt                #   Scene, Renderer, Clock, Raycaster
-│   │   ├── Camera.kt              #   PerspectiveCamera
-│   │   ├── Geometry.kt            #   IcosahedronGeometry
-│   │   ├── Material.kt            #   MeshPhysicalMaterial
-│   │   └── Objects.kt             #   Mesh, Lights
-│   ├── deformation/
-│   │   ├── SpringPhysics.kt       # Per-vertex spring simulation
-│   │   └── DeformationController.kt # Input → vertex displacement
-│   ├── gesture/
-│   │   └── GestureEngine.kt       # MediaPipe hand gesture classifier
-│   ├── audio/
-│   │   └── SoundEngine.kt         # Procedural ASMR sound synthesis
-│   └── ui/
-│       ├── InputHandler.kt        # Keyboard/mouse/scroll/touch events
-│       └── HtmlOverlay.kt         # DOM UI (sections, buttons, breathing)
-└── resources/
-    ├── index.html                 # Page shell + MediaPipe bridge
-    └── style.css                  # Glassmorphism UI, themes, animations
+src/jsMain/kotlin/
+  Main.kt                       entry point, animation loop, gesture wiring
+  graph/MathGraph.kt             3D surface renderer, multi-equation, coefficient UI
+  deformation/
+    SpringPhysics.kt             spring sim, volume preservation, smoothing
+    DeformationController.kt     poke, slice, explode, pinch, pull
+    WaveSystem.kt                spherical harmonic wave propagation
+  gesture/GestureEngine.kt       hand tracking, gesture classification
+  audio/SoundEngine.kt           procedural ASMR synthesis
+  ui/
+    HtmlOverlay.kt               tabs, buttons, breathing overlay
+    InputHandler.kt              mouse, keyboard, scroll, touch
+  three/                         Three.js external declarations
+
+src/jsMain/resources/
+  index.html                     page shell, MediaPipe bridge, finger overlay
+  style.css                      dark UI, equation bar, graph panel
 ```
 
-## Build & Run
+## Run locally
 
 ```bash
-# Prerequisites: JDK 21
-export JAVA_HOME=/path/to/jdk-21
+chmod +x run.sh
+./run.sh
+```
 
-# Build
-./gradlew jsBrowserDevelopmentWebpack
+Needs JDK 11-21 and Node.js. The script auto-detects or installs both.
 
-# Serve
-cd build/dist/js/developmentExecutable
-python3 -m http.server 8080
+Or manually:
+
+```bash
+./gradlew jsBrowserDevelopmentRun -Dorg.gradle.java.home=/path/to/jdk
 ```
 
 Open http://localhost:8080
+
+## Who this is for
+
+People who learn maths by touching things. People whose brains won't stop unless their hands are busy. People who want to see what `z = sin(2sqrt(x² + y²))` actually looks like and then squish it.

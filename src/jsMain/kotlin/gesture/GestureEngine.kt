@@ -319,8 +319,9 @@ class GestureEngine {
             (thumbTipZ - indexTipZ) * (thumbTipZ - indexTipZ)
         )
         prevPinchAmount = pinchAmount
-        // Map distance to 0-1 range: ~0.15 = open, ~0.03 = pinched
-        pinchAmount = (1.0 - ((pinchDist - 0.03) / 0.12).coerceIn(0.0, 1.0))
+        // Map distance to 0-1 range — generous range for easier pinch detection
+        // ~0.20 = fully open, ~0.04 = pinched tight
+        pinchAmount = (1.0 - ((pinchDist - 0.04) / 0.16).coerceIn(0.0, 1.0))
 
         // Two-hand resize tracking
         if (hand2Detected && hand2_3D != null) {
@@ -586,13 +587,21 @@ class GestureEngine {
             if (bothOpen) return HandGesture.TWO_HAND_RESIZE
         }
 
+        // Also check thumb-to-middle pinch (some people pinch with middle finger)
+        val middleTipX = lm[12].x as Double
+        val middleTipY = lm[12].y as Double
+        val thumbMiddleDist = hypot(thumbTipX - middleTipX, thumbTipY - middleTipY)
+        val anyPinchClose = okDist < 0.10 || thumbMiddleDist < 0.08
+
         return when {
-            // Pinch: thumb+index close, other fingers relaxed (different from OK which requires other fingers up)
-            okDist < 0.06 && !middleUp && !ringUp && !pinkyUp -> HandGesture.PINCH
-            // Pull: pinch + hand moving away from camera (depth increasing)
-            okDist < 0.06 && depthDelta < -0.003 -> HandGesture.PULL
-            // OK sign: thumb+index touching, at least one other finger extended
-            okDist < 0.06 && (middleUp || ringUp || pinkyUp) -> HandGesture.OK
+            // Pinch: thumb+index OR thumb+middle close — very forgiving, any finger state
+            anyPinchClose && okDist < 0.10 && !middleUp && !ringUp -> HandGesture.PINCH
+            // Also pinch if just thumb+index are close regardless of other fingers
+            okDist < 0.07 -> HandGesture.PINCH
+            // Pull: pinch + hand moving away from camera
+            anyPinchClose && depthDelta < -0.003 -> HandGesture.PULL
+            // OK sign: thumb+index touching AND at least 2 other fingers clearly up
+            okDist < 0.06 && middleUp && (ringUp || pinkyUp) -> HandGesture.OK
             // Spread / jazz hands: ALL 5 fingers including thumb AND spread apart → explode
             thumbUp && indexUp && middleUp && ringUp && pinkyUp && areFingersSpread(lm) -> HandGesture.SPREAD
             // Horns / rock sign: index + pinky only → scramble

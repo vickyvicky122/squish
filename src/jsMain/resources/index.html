@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoftSpace — Your calm workspace companion</title>
+    <title>squish.space — 3D maths you can touch</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -164,8 +164,10 @@
     }
 
     // ============================================================
-    //  Gesture init / stop
+    //  Gesture init / stop — create once, then pause/resume
     // ============================================================
+    window._handsInitialized = false;
+
     window.initGesture = function() {
         if (window._gestureActive) return;
         window._gestureActive = true;
@@ -189,6 +191,27 @@
             document.body.appendChild(label);
         }
         label.style.display = '';
+
+        // If already initialized, just resume camera
+        if (window._handsInitialized) {
+            if (window._cameraInstance) {
+                window._cameraInstance.start();
+            } else {
+                // Recreate camera only (not hands)
+                var cam = new Camera(video, {
+                    onFrame: async function() {
+                        if (window._handsInstance && window._gestureActive) {
+                            await window._handsInstance.send({image: video});
+                        }
+                    },
+                    width: 640, height: 480
+                });
+                cam.start();
+                window._cameraInstance = cam;
+            }
+            return;
+        }
+        window._handsInitialized = true;
 
         var hands = new Hands({
             locateFile: function(file) {
@@ -283,16 +306,9 @@
         window._hand2Detected = false;
         window._hand2Landmarks = null;
 
+        // Just stop the camera feed — don't destroy hands instance (WASM can't reinit)
         if (window._cameraInstance) {
             window._cameraInstance.stop();
-            window._cameraInstance = null;
-        }
-        window._handsInstance = null;
-
-        var video = document.getElementById('gestureVideo');
-        if (video && video.srcObject) {
-            video.srcObject.getTracks().forEach(function(t) { t.stop(); });
-            video.srcObject = null;
         }
 
         // Hide overlay + label
@@ -302,6 +318,6 @@
     };
     </script>
 
-    <script src="squishy-blob.js"></script>
+    <script src="squish-space.js"></script>
 </body>
 </html>
